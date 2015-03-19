@@ -27,7 +27,7 @@ The input is written in ascii text, e.g.:
     2*I1 + 1 = (1+2) * 3
 
 #   Output
-After solve the equation of `[M][I] = [B]`, the unknown vector will be given,
-in the  above  case the vector `I`.
+After solving the equation of `[M][I] = [B]`, the unknown vector will be 
+given, in the above case the vector `I`.
 
 [least squares]: http://en.wikipedia.org/wiki/Least_squares
