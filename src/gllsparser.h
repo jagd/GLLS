@@ -18,8 +18,9 @@ public:
 private:
     GllsParser(const GllsParser &) = delete;
     GllsParser &operator=(const GllsParser &) = delete;
+    void readUnknownName();
     std::istream &stream_;
-    std::string xName_;
+    std::string unknownName_;
     SymbolList sym_;
 };
 
