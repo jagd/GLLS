@@ -36,3 +36,13 @@ std::pair<int, std::string> nextLine(std::istream &stm)
     }
     return std::make_pair(counter, std::move(s));
 }
+
+const char *ParserError::what() const noexcept
+{
+    return msg_.c_str();
+}
+
+ParserError::ParserError(int line, const std::string &msg)
+        : line_(line),  msg_(msg)
+{
+}

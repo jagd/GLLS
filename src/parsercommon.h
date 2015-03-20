@@ -7,6 +7,7 @@
 #include <iosfwd>
 #include <utility>
 #include <string>
+#include <stdexcept>
 
 /**
 *   @brief read the next effective line from the stream, after filtering the
@@ -17,5 +18,17 @@
 *           of line consumed is set to zero.
 */
 std::pair<int, std::string> nextLine(std::istream &);
+
+class ParserError : public std::exception
+{
+public:
+    ParserError(int line,  const std::string &msg);
+    virtual const char *what() const noexcept override;
+    int line() const { return line_; }
+    const std::string &msg() const { return msg_; }
+private:
+    const int line_;
+    const std::string msg_;
+};
 
 #endif //_GENERAL_LINEAR_LEAST_SQUARES_PARSERCOMMON_H_
