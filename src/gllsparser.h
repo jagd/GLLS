@@ -20,7 +20,6 @@ private:
     GllsParser &operator=(const GllsParser &) = delete;
     std::istream &stream_;
     std::string xName;
-
 };
 
 

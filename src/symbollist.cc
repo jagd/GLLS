@@ -5,7 +5,7 @@
 
 bool SymbolList::insert(const std::string &s)
 {
-    if (s.length() == 0) {
+    if (s.empty()) {
         return false;
     }
     const auto it = map_.find(s);

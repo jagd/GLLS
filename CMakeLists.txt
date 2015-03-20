@@ -16,10 +16,13 @@ add_executable(test_all
     src/test/test_all.cc
     src/test/test_gllsparser.cc
     src/test/test_symbollist.cc
+    src/test/test_parsercommon.cc
     src/gllsparser.cc
     src/gllsparser.h
     src/symbollist.cc
     src/symbollist.h
+    src/parsercommon.cc
+    src/parsercommon.h
     )
 target_link_libraries(test_all ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 add_test(test test_all)
@@ -42,3 +45,12 @@ add_executable(test_symbollist
 set_target_properties(test_symbollist PROPERTIES COMPILE_DEFINITIONS  "BOOST_TEST_MAIN")
 target_link_libraries(test_symbollist ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
+########################################
+
+add_executable(test_parsercommon
+    src/test/test_parsercommon.cc
+    src/parsercommon.cc
+    src/parsercommon.h
+    )
+set_target_properties(test_parsercommon PROPERTIES COMPILE_DEFINITIONS  "BOOST_TEST_MAIN")
+target_link_libraries(test_parsercommon ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})

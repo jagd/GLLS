@@ -14,6 +14,7 @@ BOOST_AUTO_TEST_SUITE()
     BOOST_AUTO_TEST_CASE(EmptySymbol) {
         SymbolList l;
         BOOST_ASSERT(!l.insert(""));
+        BOOST_ASSERT(l.query("") < 0);
     }
 
     BOOST_AUTO_TEST_CASE(GeneralTest) {
