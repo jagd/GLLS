@@ -24,12 +24,14 @@ std::pair<int, std::string> nextLine(std::istream &stm)
         if (len != s.npos) {
             s.resize(len);
         }
-        if (std::any_of(s.cbegin(), s.cend(), std::not1(std::cref(isspace)))) {
+        if (std::any_of(s.cbegin(), s.cend(),
+                std::not1(std::ptr_fun<int, int>(std::isspace)))
+           ) {
              break;
         }
     }
     // trim the end
-    while (!s.empty() && isspace(*(s.end()-1))) {
+    while (!s.empty() && std::isspace(*(s.end()-1))) {
         s.pop_back();
     }
     return std::make_pair(counter, std::move(s));
