@@ -1,7 +1,5 @@
 #include "../parsercommon.h"
-#include <streambuf>
-
-
+#include <sstream>
 
 #ifndef BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE ParserCommon
@@ -12,7 +10,7 @@ BOOST_AUTO_TEST_SUITE(TestNextLine)
 
     BOOST_AUTO_TEST_CASE(NoContent) {
         std::stringstream ss("");
-        BOOST_CHECK_EQUAL(nextLine(ss).first, 0);
+        BOOST_CHECK_EQUAL(nextLine(ss).first, -1);
     }
 
     BOOST_AUTO_TEST_CASE(SingleLine_1) {
@@ -31,12 +29,12 @@ BOOST_AUTO_TEST_SUITE(TestNextLine)
 
     BOOST_AUTO_TEST_CASE(EmptyLine_1) {
         std::stringstream ss("\n");
-        BOOST_CHECK_EQUAL(nextLine(ss).first, 0);
+        BOOST_CHECK_EQUAL(nextLine(ss).first, -2);
     }
 
     BOOST_AUTO_TEST_CASE(EmptyLine_2) {
         std::stringstream ss("\n \n \n");
-        BOOST_CHECK_EQUAL(nextLine(ss).first, 0);
+        BOOST_ASSERT(nextLine(ss).first <= 0);
     }
 
     BOOST_AUTO_TEST_CASE(EmptyLine_3) {
@@ -55,7 +53,7 @@ BOOST_AUTO_TEST_SUITE(TestNextLine)
 
     BOOST_AUTO_TEST_CASE(Comment_1) {
         std::stringstream ss("# abcdefg");
-        BOOST_CHECK_EQUAL(nextLine(ss).first, 0);
+        BOOST_CHECK_EQUAL(nextLine(ss).first, -1);
     }
 
     BOOST_AUTO_TEST_CASE(Comment_2) {
@@ -74,9 +72,9 @@ BOOST_AUTO_TEST_SUITE(TestNextLine)
 
     BOOST_AUTO_TEST_CASE(Comment_4) {
         std::stringstream ss("\n\n# abcdefg");
-        BOOST_CHECK_EQUAL(nextLine(ss).first, 0);
+        BOOST_CHECK_EQUAL(nextLine(ss).first, -3);
         std::stringstream s2("\n\n # abcdefg\n#def\n\n");
-        BOOST_CHECK_EQUAL(nextLine(s2).first, 0);
+        BOOST_ASSERT(nextLine(s2).first <= 0);
     }
 
     BOOST_AUTO_TEST_CASE(Comment_5) {

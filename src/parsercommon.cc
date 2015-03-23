@@ -4,7 +4,6 @@
 #include <utility>
 #include <string>
 #include <algorithm>
-#include <cctype>
 #include <functional>
 
 // for the compatibility with libstdc++ 4.8, no std::regex is used
@@ -14,7 +13,7 @@ std::pair<int, std::string> nextLine(std::istream &stm)
     std::string s;
     while (true) {
         if (!stm.good()) {
-            counter = 0;
+            counter = -counter;
             s.clear();
             break;
         }
@@ -42,7 +41,10 @@ const char *ParserError::what() const noexcept
     return msg_.c_str();
 }
 
-ParserError::ParserError(int line, const std::string &msg)
-        : line_(line),  msg_(msg)
+ParserError::ParserError(
+        int line,
+        std::string const &msg,
+        ParserError::Type t
+) : line_(line), msg_(msg), type_(t)
 {
 }
