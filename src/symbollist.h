@@ -21,7 +21,8 @@ public:
     //! @return non-negative id if found, otherwise negative
     int query(const std::string &) const;
     std::string query_id(int) const = delete;
-    void clear() { map_.clear(); nextID_ = 0;}
+    void clear() { map_.clear(); nextID_ = 0; }
+    size_t size() const { return map_.size(); }
 private:
     int nextID_;
     std::map<std::string, int> map_;

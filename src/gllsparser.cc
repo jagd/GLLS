@@ -14,6 +14,7 @@ GllsParser::GllsParser(std::istream &stream_)
 std::vector<double> GllsParser::run()
 {
     readUnknownName();
+    readSymbols();
     return std::vector<double>();
 }
 
@@ -60,5 +61,35 @@ void GllsParser::checkGood(
                 msg,
                 ParserError::Type::UNEXPECTED_EOF
         );
+    }
+}
+
+void GllsParser::readSymbols()
+{
+    sym_.clear();
+    static const std::string fail_msg("failed to read name of symbols");
+    const auto l = nextLine(stream_);
+    checkGood(l, fail_msg + ": unexpected file end");
+    currentLine_ += l.first;
+    std::stringstream ss(std::move(l.second));
+    std::string s;
+    while (ss >> s) {
+        if ( std::any_of(s.cbegin(), s.cend(),
+                std::not1(std::ptr_fun<int,int>(std::isalpha))) )
+        {
+            throw ParserError(
+                    currentLine_-1,
+                    fail_msg + ": invalid name " + s,
+                    ParserError::Type::INVALID_TOKEN
+            );
+
+        }
+        if (!sym_.insert(s)) {
+            throw ParserError(
+                    currentLine_-1,
+                    fail_msg + ": duplicated name " + s,
+                    ParserError::Type::UNEXPECTED_CHAR
+            );
+        }
     }
 }

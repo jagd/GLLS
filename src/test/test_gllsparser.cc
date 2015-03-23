@@ -58,5 +58,37 @@ BOOST_AUTO_TEST_SUITE()
         );
     }
 
+    BOOST_AUTO_TEST_CASE(ReadSymbols_1) {
+        std::stringstream ss("x\n");
+        GllsParser gp(ss);
+        BOOST_CHECK_EXCEPTION(gp.run(), ParserError,
+                [](const ParserError &e) {
+                    BOOST_CHECK_EQUAL(e.line(), 2);
+                    return e.type() == ParserError::Type::UNEXPECTED_EOF;
+                }
+        );
+    }
+
+    BOOST_AUTO_TEST_CASE(ReadSymbols_2) {
+        std::stringstream ss("x\na 1");
+        GllsParser gp(ss);
+        BOOST_CHECK_EXCEPTION(gp.run(), ParserError,
+                [](const ParserError &e) {
+                    BOOST_CHECK_EQUAL(e.line(), 2);
+                    return e.type() == ParserError::Type::INVALID_TOKEN;
+                }
+        );
+    }
+
+    BOOST_AUTO_TEST_CASE(ReadSymbols_3) {
+        std::stringstream ss("x\na b c b");
+        GllsParser gp(ss);
+        BOOST_CHECK_EXCEPTION(gp.run(), ParserError,
+                [](const ParserError &e) {
+                    BOOST_CHECK_EQUAL(e.line(), 2);
+                    return e.type() == ParserError::Type::UNEXPECTED_CHAR;
+                }
+        );
+    }
 
 BOOST_AUTO_TEST_SUITE_END()
