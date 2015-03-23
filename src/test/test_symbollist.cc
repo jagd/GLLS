@@ -41,4 +41,14 @@ BOOST_AUTO_TEST_SUITE()
         BOOST_CHECK_EQUAL(l.query("aBc"), 2);
     }
 
+    BOOST_AUTO_TEST_CASE(Clear) {
+        SymbolList l;
+        BOOST_REQUIRE(l.insert("012"));
+        BOOST_REQUIRE(l.insert("abc"));
+        BOOST_REQUIRE(l.insert("def"));
+        l.clear();
+        BOOST_REQUIRE(l.insert("abc"));
+        BOOST_CHECK_EQUAL(l.query("abc"), 0);
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
