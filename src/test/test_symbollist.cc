@@ -17,6 +17,15 @@ BOOST_AUTO_TEST_SUITE()
         BOOST_ASSERT(l.query("") < 0);
     }
 
+    BOOST_AUTO_TEST_CASE(Duplication) {
+        SymbolList l;
+        BOOST_ASSERT(l.insert("123"));
+        BOOST_ASSERT(l.insert("abc"));
+        BOOST_ASSERT(!l.insert("abc"));
+        BOOST_ASSERT(l.insert("def"));
+        BOOST_ASSERT(l.query("def") == 2);
+    }
+
     BOOST_AUTO_TEST_CASE(GeneralTest) {
         SymbolList l;
         BOOST_ASSERT(!l.insert(""));
@@ -46,6 +55,7 @@ BOOST_AUTO_TEST_SUITE()
         BOOST_REQUIRE(l.insert("012"));
         BOOST_REQUIRE(l.insert("abc"));
         BOOST_REQUIRE(l.insert("def"));
+        BOOST_CHECK_EQUAL(l.query("abc"), 1);
         l.clear();
         BOOST_REQUIRE(l.insert("abc"));
         BOOST_CHECK_EQUAL(l.query("abc"), 0);
