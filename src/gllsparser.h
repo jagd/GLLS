@@ -25,10 +25,20 @@ private:
     ) const;
     void readUnknownName();
     void readSymbols();
+    /**
+    *   In order to avoid unget() on stream, combine
+    *   the reading of coefficients and conditions together
+    */
+    void readCoefWithCond();
+    void attachCoef(const std::string &s);
+    void attachCond(const std::string &s);
+    void estimateUnknownNumber(const std::string &s);
     std::istream &stream_;
     int currentLine_;
+    int unknownNumber_;
     std::string unknownName_;
     SymbolList sym_;
+    std::vector<double> coef_;
 };
 
 
