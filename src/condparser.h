@@ -43,4 +43,29 @@ Grammar:
 #ifndef _GENERAL_LINEAR_LEAST_SQUARES_CONDPARSER_H_
 #define _GENERAL_LINEAR_LEAST_SQUARES_CONDPARSER_H_
 
+#include "symbollist.h"
+#include <string>
+#include <iosfwd>
+
+class Lexer
+{
+public:
+    Lexer(std::istream &s, SymbolList, const std::string &varName);
+    std::string str;
+    double num;
+    //! for both ascii symbol and numbered symbol
+    int symbol;
+    //! symbol ID for constant
+    static const int ID_CON = -1;
+    //! symbol ID for the unknown variable
+    static const int ID_VAR = -2;
+    //! invalid symbol ID
+    static const int ID_INV = -3;
+private:
+    std::istream &stream_;
+    const std::string varName_;
+    const SymbolList sym_;
+};
+
+
 #endif //_GENERAL_LINEAR_LEAST_SQUARES_CONDPARSER_H_
