@@ -24,14 +24,20 @@ CondLexer::Token CondLexer::token()
     int peek = stream_.peek();
     if (peek == EOF) {
         return Token::TK_EOF;
-    } else if (peek == '-' || peek == '+') {
-        return peekMinusOrPlus();
-    } else if (peek == '*' || peek == '/') {
-        symbol_ = stream_.get();
-        return Token::TK_OP;
     } else if (std::isdigit(peek)) {
         stream_ >> num_;
         return Token::TK_NUM;
+    } else switch (peek) {
+        case '-':
+        case '+':
+            return peekMinusOrPlus();
+        case '*':
+        case '/':
+        case '(':
+        case ')':
+        case '=':
+            symbol_ = stream_.get();
+            return Token::TK_OP;
     }
     symbol_ = stream_.get();
     return Token::TK_INVALID;
