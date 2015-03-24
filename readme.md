@@ -20,7 +20,6 @@ The input is written in ascii text, e.g.:
     2   3.3 4
     5   6   7
     4   4   3e8
-    constraints
     # each line contains an equation, can include several ='s
     Br0 = 0 = Br1
     Bz1 + 5 = Bz0 * 2 + (2 + 4)*Bz3 = (Psi3 + Bz1*2) * 6 = (Bz0 + Bz2)

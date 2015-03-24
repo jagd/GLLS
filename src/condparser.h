@@ -47,14 +47,15 @@ Grammar:
 #include <string>
 #include <iosfwd>
 
-class Lexer
+class CondLexer
 {
 public:
-    Lexer(std::istream &s, SymbolList, const std::string &varName);
-    std::string str;
-    double num;
-    //! for both ascii symbol and numbered symbol
-    int symbol;
+    CondLexer(std::istream &s, SymbolList, const std::string &varName);
+    enum class Token {TK_INVALID, TK_EOF, TK_NUM, TK_ID, TK_OP};
+    double num() const { return num_; }
+    int symbol() const { return symbol_; }
+    const std::string &msg() const { return msg_; }
+    Token token();
     //! symbol ID for constant
     static const int ID_CON = -1;
     //! symbol ID for the unknown variable
@@ -64,7 +65,13 @@ public:
 private:
     std::istream &stream_;
     const std::string varName_;
-    const SymbolList sym_;
+    const SymbolList symList_;
+    Token peekMinusOrPlus();
+    double num_;
+    //! for both ascii symbol and numbered symbol
+    int symbol_;
+    //! error message
+    std::string msg_;
 };
 
 
