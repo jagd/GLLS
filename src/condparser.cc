@@ -3,19 +3,45 @@
 #include "parsercommon.h"
 
 #include <istream>
+#include <sstream>
 #include <cassert>
 #include <cctype>
 
-CondLexer::CondLexer(
-        std::istream &s,
-        SymbolList symList,
-        const std::string &varName
-) : stream_(s), varName_(varName), symList_(symList)
+
+CondDict::CondDict(const SymbolList &sl, const std::string &varName)
+    : varName_(varName), symList_(sl)
 {
-    // assert(!varName.empty());
-    if (varName.empty()) {
+    // assert(!varName_.empty());
+    checkVarName();
+}
+
+CondDict::CondDict(SymbolList &&sl, const std::string &varName)
+        : varName_(varName), symList_(sl)
+{
+    // assert(!varName_.empty());
+    checkVarName();
+}
+
+void CondDict::checkVarName() const
+{
+    if (varName_.empty()) {
         throw std::logic_error("CondLexer: variable name can not be empty");
     }
+}
+
+int CondDict::symToID(const std::string &name, int index) const
+{
+    return ID_INV;
+}
+
+CondLexer::CondLexer(std::istream &s, const CondDict &d)
+        : stream_(s), dict_(d)
+{
+}
+
+CondLexer::CondLexer(std::istream &s, CondDict &&d)
+        : stream_(s), dict_(d)
+{
 }
 
 CondLexer::Token CondLexer::token()
@@ -24,6 +50,8 @@ CondLexer::Token CondLexer::token()
     int peek = stream_.peek();
     if (peek == EOF) {
         return Token::TK_EOF;
+    } else if (std::isalpha(peek)) {
+        return peekAlpha();
     } else if (std::isdigit(peek)) {
         stream_ >> num_;
         return Token::TK_NUM;
@@ -40,6 +68,8 @@ CondLexer::Token CondLexer::token()
             return Token::TK_OP;
     }
     symbol_ = stream_.get();
+    msg_ = "invalid symbol ";
+    msg_ += static_cast<char>(symbol_);
     return Token::TK_INVALID;
 }
 
@@ -60,4 +90,38 @@ CondLexer::Token CondLexer::peekMinusOrPlus()
         symbol_ = ch;
         return Token::TK_OP;
     }
+}
+
+CondLexer::Token CondLexer::peekAlpha()
+{
+    std::string name;
+    std::string numstr;
+    while (std::isalpha(stream_.peek())) {
+        name.push_back(stream_.get());
+    }
+    while (std::isdigit(stream_.peek())) {
+        numstr.push_back(stream_.get());
+    }
+    if (numstr.empty()) {
+        msg_ = name + " should follow an integer index";
+        return Token::TK_INVALID;
+    }
+    // do not use std::istringstream because it differs from 010 and 10
+    int num = 0;
+    for (auto i : numstr) {
+        if (i == '\0') {
+            break;
+        }
+        num *= 10;
+        num += i - '0';
+    }
+    msg_.clear();
+    symbol_ = dict_.symToID(name, num);
+    if (symbol_ == dict_.ID_INV)  {
+        msg_ += ", invalid symbol ";
+        msg_ += name;
+        msg_ += numstr;
+        return Token::TK_INVALID;
+    }
+    return Token::TK_ID;
 }
