@@ -7,6 +7,9 @@
 #include <cassert>
 #include <cctype>
 
+//constexpr int CondDict::ID_CONST;
+//constexpr int CondDict::ID_INV;
+//constexpr int CondDict::ID_VAR_BASE;
 
 CondDict::CondDict(const SymbolList &sl, const std::string &varName)
     : varName_(varName), symList_(sl)
@@ -16,7 +19,7 @@ CondDict::CondDict(const SymbolList &sl, const std::string &varName)
 }
 
 CondDict::CondDict(SymbolList &&sl, const std::string &varName)
-        : varName_(varName), symList_(sl)
+    : varName_(varName), symList_(sl)
 {
     // assert(!varName_.empty());
     checkVarName();
@@ -31,6 +34,14 @@ void CondDict::checkVarName() const
 
 int CondDict::symToID(const std::string &name, int index) const
 {
+    assert(index >= 0);
+    if (name == varName_) {
+        return ID_VAR_BASE - index;
+    }
+    const int offset = symList_.query(name);
+    if (offset > 0) {
+        return symList_.size() * index + offset;
+    }
     return ID_INV;
 }
 

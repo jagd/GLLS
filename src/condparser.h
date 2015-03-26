@@ -59,11 +59,11 @@ public:
     CondDict(const SymbolList &, const std::string &varName);
     CondDict(SymbolList &&, const std::string &varName);
     //! symbol ID for constant
-    static const int ID_CONST = -1;
+    static constexpr int ID_CONST = -1;
     //! invalid symbol ID
-    static const int ID_INV = -2;
+    static constexpr int ID_INV = -2;
     //! the first symbol ID for the unknown variable
-    static const int ID_VAR_BASE = -10;
+    static constexpr int ID_VAR_BASE = -10;
     int symToID(const std::string &name, int index) const;
 private:
     const std::string varName_;
