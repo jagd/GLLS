@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
+if (CMAKE_COMPILER_IS_GNUCXX)
 set(CMAKE_CONFIGURATION_TYPES Coverage Debug Release RelWithDebInfo CACHE TYPE INTERNAL FORCE )
+else()
+set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo CACHE TYPE INTERNAL FORCE )
+endif()
 project(General-Linear-Least-Squares)
 enable_testing()
 
@@ -8,6 +12,10 @@ find_program(LCOV lcov)
 find_program(GENHTML genhtml)
 
 find_package(Boost COMPONENTS unit_test_framework OPTIONAL)
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    link_directories(${Boost_LIBRARY_DIRS})
+endif()
 
 if (CMAKE_COMPILER_IS_GNUCXX)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic")
@@ -15,6 +23,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -O3  -fomit-fra
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
 set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
 set(CMAKE_EXE_LINKER_FLAGS_COVERAGE "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
+else(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi /W4 /EHsc")
 endif()
 
 aux_source_directory(src SRC_LIST)

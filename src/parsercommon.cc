@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>
 #include <functional>
+#include <cctype>
 
 // for the compatibility with libstdc++ 4.8, no std::regex is used
 std::pair<int, std::string> nextLine(std::istream &stm)

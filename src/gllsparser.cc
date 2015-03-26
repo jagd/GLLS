@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <functional>
 #include <cassert>
+#include <cctype>
 
 GllsParser::GllsParser(std::istream &stream_)
         : stream_(stream_), currentLine_(1), unknownNumber_(0)
