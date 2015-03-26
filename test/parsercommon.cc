@@ -1,4 +1,4 @@
-#include "../parsercommon.h"
+#include "../src/parsercommon.h"
 #include <sstream>
 
 #ifndef BOOST_TEST_DYN_LINK

@@ -1,5 +1,5 @@
-#include "../gllsparser.h"
-#include "../parsercommon.h"
+#include "../src/gllsparser.h"
+#include "../src/parsercommon.h"
 #include <sstream>
 
 #ifndef BOOST_TEST_DYN_LINK
@@ -54,6 +54,17 @@ BOOST_AUTO_TEST_SUITE()
                 [](const ParserError &e) {
                     BOOST_CHECK_EQUAL(e.line(), 1);
                     return e.type() == ParserError::Type::UNEXPECTED_CHAR;
+                }
+        );
+    }
+
+    BOOST_AUTO_TEST_CASE(ReadUnknownName_5) {
+        std::istringstream ss("\0\0\0");
+        GllsParser gp(ss);
+        BOOST_CHECK_EXCEPTION(gp.run(), ParserError,
+                [](const ParserError &e) {
+                    BOOST_CHECK_EQUAL(e.line(), 1);
+                    return e.type() == ParserError::Type::UNEXPECTED_EOF;
                 }
         );
     }

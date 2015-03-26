@@ -1,4 +1,4 @@
-#include "../symbollist.h"
+#include "../src/symbollist.h"
 
 #ifndef BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE SymbolList

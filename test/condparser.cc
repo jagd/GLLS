@@ -1,6 +1,6 @@
-#include "../condparser.h"
-#include "../parsercommon.h"
-#include "../symbollist.h"
+#include "../src/parsercommon.h"
+#include "../src/symbollist.h"
+#include "../src/condparser.h"
 #include <sstream>
 
 #ifndef BOOST_TEST_DYN_LINK
@@ -18,6 +18,24 @@ BOOST_AUTO_TEST_SUITE(TestCondDict)
         BOOST_CHECK_THROW(
                 CondDict(SymbolList(), ""),
                 std::exception
+        );
+    }
+
+    BOOST_AUTO_TEST_CASE(TestSymToID) {
+        auto sl = SymbolList();
+        sl.insert("y");
+        const auto dict = CondDict(sl, "x");
+        BOOST_CHECK_EQUAL(
+                dict.symToID("", 0),
+                static_cast<int>(dict.ID_INV)
+        );
+        BOOST_CHECK_EQUAL(
+                dict.symToID("x", 0),
+                static_cast<int>(dict.ID_VAR_BASE)
+        );
+        BOOST_CHECK_EQUAL(
+                dict.symToID("x", 100),
+                static_cast<int>(dict.ID_VAR_BASE-100)
         );
     }
 
