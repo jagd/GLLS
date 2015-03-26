@@ -3,9 +3,9 @@ set(CMAKE_CONFIGURATION_TYPES Coverage Debug Release RelWithDebInfo CACHE TYPE I
 project(General-Linear-Least-Squares)
 enable_testing()
 
-find_program(GCOV_PATH gcov)
-find_program(LCOV_PATH lcov)
-find_program(GENHTML_PATH genhtml)
+find_program(GCOV gcov)
+find_program(LCOV lcov)
+find_program(GENHTML genhtml)
 
 find_package(Boost COMPONENTS unit_test_framework OPTIONAL)
 
@@ -33,11 +33,11 @@ set(all_tests
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${all_tests})
 
 add_custom_target(coverage
-    COMMAND ${LCOV_PATH} -z -d .
+    COMMAND ${LCOV} -z -d .
     COMMAND ${CMAKE_CTEST_COMMAND}
-    COMMAND ${LCOV_PATH} -d . -c -o coverage_all.txt
-    COMMAND ${LCOV_PATH} -r coverage_all.txt 'test/*' '/usr/*' -o coverage_src.txt
-    COMMAND ${GENHTML_PATH} -o coverage_report coverage_src.txt
+    COMMAND ${LCOV} -d . -c -o coverage_all.txt
+    COMMAND ${LCOV} -r coverage_all.txt 'test/*' '/usr/*' -o coverage_src.txt
+    COMMAND ${GENHTML} -o coverage_report coverage_src.txt
     COMMAND ${CMAKE_COMMAND} -E remove coverage_all.txt coverage_src.txt
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     DEPENDS ${all_tests}
