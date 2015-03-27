@@ -203,6 +203,56 @@ BOOST_AUTO_TEST_SUITE(TestCondLexer)
         BOOST_CHECK_EQUAL(lexer.num(), 1.0);
     }
 
+    BOOST_AUTO_TEST_CASE(TestSym_X) {
+        std::istringstream ss("x0 x100");
+        auto sl = SymbolList();
+        sl.insert("y");
+        CondLexer lexer(ss, CondDict(sl, "x"));
+        BOOST_REQUIRE(lexer.token() == CondLexer::Token::TK_ID);
+        BOOST_CHECK_EQUAL(
+                lexer.symbol(),
+                static_cast<int>(CondDict::ID_VAR_BASE)
+        );
+        BOOST_REQUIRE(lexer.token() == CondLexer::Token::TK_ID);
+        BOOST_CHECK_EQUAL(
+                lexer.symbol(),
+                static_cast<int>(CondDict::ID_VAR_BASE-100)
+        );
+    }
+
+    BOOST_AUTO_TEST_CASE(TestSym_Y) {
+        std::istringstream ss("br0 phi2");
+        auto sl = SymbolList();
+        sl.insert("bz");
+        sl.insert("br");
+        sl.insert("phi");
+        CondLexer lexer(ss, CondDict(sl, "x"));
+        BOOST_REQUIRE(lexer.token() == CondLexer::Token::TK_ID);
+        BOOST_CHECK_EQUAL(lexer.symbol(), 1);
+        BOOST_REQUIRE(lexer.token() == CondLexer::Token::TK_ID);
+        BOOST_CHECK_EQUAL(lexer.symbol(), 8);
+    }
+
+    BOOST_AUTO_TEST_CASE(TestSym_Inv_1) {
+        std::istringstream ss("br alpha");
+        auto sl = SymbolList();
+        sl.insert("bz");
+        sl.insert("br");
+        sl.insert("phi");
+        CondLexer lexer(ss, CondDict(sl, "x"));
+        BOOST_CHECK(lexer.token() == CondLexer::Token::TK_INVALID);
+    }
+
+    BOOST_AUTO_TEST_CASE(TestSym_Inv_2) {
+        std::istringstream ss("alpha10");
+        auto sl = SymbolList();
+        sl.insert("bz");
+        sl.insert("br");
+        sl.insert("phi");
+        CondLexer lexer(ss, CondDict(sl, "x"));
+        BOOST_CHECK(lexer.token() == CondLexer::Token::TK_INVALID);
+    }
+
     BOOST_AUTO_TEST_CASE(TestInvalid) {
         std::istringstream ss("~#'!$%&|^?{}[]`,;:\"\\");
         CondLexer lexer(ss, CondDict(SymbolList(), "x"));

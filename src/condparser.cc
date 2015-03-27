@@ -122,10 +122,7 @@ CondLexer::Token CondLexer::peekAlpha()
     }
     // do not use std::istringstream because it differs from 010 and 10
     int num = 0;
-    for (auto i : numstr) {
-        if (i == '\0') {
-            break;
-        }
+    for (const auto i : numstr) {
         num *= 10;
         num += i - '0';
     }
