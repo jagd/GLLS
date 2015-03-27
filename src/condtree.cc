@@ -1,5 +1,7 @@
 #include "condtree.h"
 
+#include <memory>
+
 CondTreeNode::CondTreeNode() : type(Type::INVALID_NODE)
 {
 }
@@ -18,5 +20,49 @@ CondTreeNode::CondTreeNode(double num) : type(Type::NUM_NODE), num(num)
 
 bool CondTreeNode::isTerm() const
 {
-    return !(left_ || right_);
+    return !(left || right);
+}
+
+void CondTreeNode::removeLeaves()
+{
+    if (left) {
+        delete left.release();
+    }
+    if (right) {
+        delete right.release();
+    }
+}
+
+std::unique_ptr<CondTreeNode> CondTreeNode::make(int id)
+{
+    /* there is no make_unique() in C++11, but make_shared */
+    return std::unique_ptr<CondTreeNode>(new CondTreeNode(id));
+}
+
+std::unique_ptr<CondTreeNode> CondTreeNode::make(char op)
+{
+    return std::unique_ptr<CondTreeNode>(new CondTreeNode(op));
+}
+
+std::unique_ptr<CondTreeNode> CondTreeNode::make(double num)
+{
+    return std::unique_ptr<CondTreeNode>(new CondTreeNode(num));
+}
+
+CondTreeNode::~CondTreeNode()
+{
+    removeLeaves();
+}
+
+bool CondTreeNode::isValid() const
+{
+    return
+        (
+              !(left || right)
+            && (type == Type::NUM_NODE || type == Type::ID_NODE)
+        ) || (
+               (type == Type::OP_NODE)
+            && left && right
+            && left->isValid() && right->isValid()
+        );
 }
