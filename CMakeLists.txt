@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-if (CMAKE_COMPILER_IS_GNUCXX)
+if (UNIX OR CYGWIN)
 set(CMAKE_CONFIGURATION_TYPES Coverage Debug Release RelWithDebInfo CACHE TYPE INTERNAL FORCE )
 else()
 set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo CACHE TYPE INTERNAL FORCE )
