@@ -263,3 +263,19 @@ BOOST_AUTO_TEST_SUITE(TestCondLexer)
     }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(TestCondParser)
+
+    BOOST_AUTO_TEST_CASE(Ctor_1) {
+        std::istringstream ss;
+        auto sl = SymbolList();
+        BOOST_CHECK_NO_THROW(CondParser(ss, sl, "x"));
+    }
+
+    BOOST_AUTO_TEST_CASE(Ctor_2) {
+        std::istringstream ss;
+        auto sl = SymbolList();
+        BOOST_CHECK_THROW(CondParser(ss, sl, ""), std::exception);
+    }
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -136,3 +136,11 @@ CondLexer::Token CondLexer::peekAlpha()
     }
     return Token::TK_ID;
 }
+
+CondParser::CondParser(
+        std::istream & s,
+        const SymbolList &l,
+        const std::string &varName
+) : lexer_(s, CondDict(l, varName))
+{
+}

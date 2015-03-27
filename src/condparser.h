@@ -97,5 +97,11 @@ private:
     const CondDict dict_;
 };
 
+class CondParser {
+public:
+    CondParser(std::istream &, const SymbolList &, const std::string &varName);
+private:
+    CondLexer lexer_;
+};
 
 #endif //_GENERAL_LINEAR_LEAST_SQUARES_CONDPARSER_H_
