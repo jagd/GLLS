@@ -13,6 +13,7 @@ public:
     explicit CondTreeNode(int id);
     explicit CondTreeNode(char op);
     explicit CondTreeNode(double num);
+    std::unique_ptr<CondTreeNode> clone() const;
     static std::unique_ptr<CondTreeNode> make(int id);
     static std::unique_ptr<CondTreeNode> make(char op);
     static std::unique_ptr<CondTreeNode> make(double num);

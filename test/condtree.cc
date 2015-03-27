@@ -15,6 +15,16 @@ BOOST_AUTO_TEST_SUITE()
         BOOST_CHECK(CondTreeNode(3.14).type == CondTreeNode::Type::NUM_NODE);
     }
 
+    BOOST_AUTO_TEST_CASE(CopyCtor) {
+        auto root = CondTreeNode::make('*');
+        root->left = CondTreeNode::make(1);
+        root->right = CondTreeNode::make(2);
+        auto c = root->clone();
+        root->left = CondTreeNode::make('-');
+        BOOST_CHECK(!root->isValid());
+        BOOST_CHECK(c->isValid());
+    }
+
     BOOST_AUTO_TEST_CASE(IsTerm_1) {
         const auto root = CondTreeNode();
         BOOST_CHECK_EQUAL(root.isTerm(), true);

@@ -66,3 +66,8 @@ CondTreeNode::CondTreeNode(const CondTreeNode &root)
         right.reset(new CondTreeNode(*(root.right)));
     }
 }
+
+std::unique_ptr<CondTreeNode> CondTreeNode::clone() const
+{
+    return std::unique_ptr<CondTreeNode>(new CondTreeNode(*this));
+}
