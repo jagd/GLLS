@@ -64,6 +64,8 @@ public:
     static constexpr int ID_INV = -2;
     //! the first symbol ID for the unknown variable
     static constexpr int ID_VAR_BASE = -10;
+    //! the first ID for the Y symbols
+    static constexpr int ID_SYM_BASE = 0;
     int symToID(const std::string &name, int index) const;
 private:
     const std::string varName_;

@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_SUITE(TestCondDict)
         );
     }
 
-    BOOST_AUTO_TEST_CASE(TestSymToID) {
+    BOOST_AUTO_TEST_CASE(TestSymToID_X) {
         auto sl = SymbolList();
         sl.insert("y");
         const auto dict = CondDict(sl, "x");
@@ -39,13 +39,24 @@ BOOST_AUTO_TEST_SUITE(TestCondDict)
         );
     }
 
+    BOOST_AUTO_TEST_CASE(TestSymToID_Y) {
+        auto sl = SymbolList();
+        sl.insert("bz");
+        sl.insert("br");
+        sl.insert("phi");
+        const auto dict = CondDict(sl, "x");
+        BOOST_CHECK_EQUAL(dict.symToID("br", 0), 1);
+        BOOST_CHECK_EQUAL(dict.symToID("phi", 2), 8);
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(TestCondLexer)
 
     BOOST_AUTO_TEST_CASE(Ctor_1) {
         std::istringstream ss;
-        BOOST_CHECK_NO_THROW(CondLexer lexer(ss, CondDict(SymbolList(), "x")));
+        const auto dict = CondDict(SymbolList(), "x");
+        BOOST_CHECK_NO_THROW(CondLexer lexer(ss, dict));
     }
 
     BOOST_AUTO_TEST_CASE(TestEOF_1) {
