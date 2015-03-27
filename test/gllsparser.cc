@@ -23,6 +23,12 @@ BOOST_AUTO_TEST_SUITE()
                     return e.type() == ParserError::Type::UNEXPECTED_EOF;
                 }
         );
+
+        try {
+            gp.run();
+        } catch (ParserError &e) {
+            BOOST_CHECK(e.what() != nullptr);
+        }
     }
 
     BOOST_AUTO_TEST_CASE(ReadUnknownName_2) {
