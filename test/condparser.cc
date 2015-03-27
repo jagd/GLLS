@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_SUITE(TestCondLexer)
     BOOST_AUTO_TEST_CASE(Ctor_1) {
         std::istringstream ss;
         const auto dict = CondDict(SymbolList(), "x");
-        BOOST_CHECK_NO_THROW(CondLexer lexer(ss, dict));
+        BOOST_CHECK_NO_THROW(CondLexer(ss, dict));
     }
 
     BOOST_AUTO_TEST_CASE(TestEOF_1) {
