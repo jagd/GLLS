@@ -27,22 +27,6 @@ BOOST_AUTO_TEST_SUITE()
         BOOST_CHECK_EQUAL(root->isTerm(), false);
     }
 
-    BOOST_AUTO_TEST_CASE(RemoveLeaves) {
-        auto root = CondTreeNode::make('*');
-        root->left = CondTreeNode::make(1);
-        root->right = CondTreeNode::make(2);
-        BOOST_CHECK(!root->isTerm());
-        root->removeLeaves();
-        BOOST_CHECK(root->isTerm());
-        root->left = CondTreeNode::make('+');
-        root->left->left = CondTreeNode::make(1.2);
-        root->left->right = CondTreeNode::make(2);
-        root->right = CondTreeNode::make('-');
-        BOOST_CHECK(!root->isTerm());
-        root->removeLeaves();
-        BOOST_CHECK(root->isTerm());
-    }
-
     BOOST_AUTO_TEST_CASE(IsValid) {
         auto root = CondTreeNode::make('*');
         BOOST_CHECK(!root->isValid());
@@ -50,20 +34,16 @@ BOOST_AUTO_TEST_SUITE()
         BOOST_CHECK(!root->isValid());
         root->right = CondTreeNode::make(2);
         BOOST_CHECK(root->isValid());
-        root->removeLeaves();
-        BOOST_CHECK(!root->isValid());
         root->left = CondTreeNode::make('+');
         BOOST_CHECK(!root->isValid());
         root->left->left = CondTreeNode::make(1.2);
         BOOST_CHECK(!root->isValid());
         root->left->right = CondTreeNode::make(2);
-        BOOST_CHECK(!root->isValid());
+        BOOST_CHECK(root->isValid());
         root->right = CondTreeNode::make('-');
         BOOST_CHECK(!root->isValid());
         root->right = CondTreeNode::make(-1.0);
         BOOST_CHECK(root->isValid());
-        root->removeLeaves();
-        BOOST_CHECK(!root->isValid());
     }
 
 BOOST_AUTO_TEST_SUITE_END()

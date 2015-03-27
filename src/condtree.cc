@@ -23,16 +23,6 @@ bool CondTreeNode::isTerm() const
     return !(left || right);
 }
 
-void CondTreeNode::removeLeaves()
-{
-    if (left) {
-        delete left.release();
-    }
-    if (right) {
-        delete right.release();
-    }
-}
-
 std::unique_ptr<CondTreeNode> CondTreeNode::make(int id)
 {
     /* there is no make_unique() in C++11, but make_shared */
@@ -47,11 +37,6 @@ std::unique_ptr<CondTreeNode> CondTreeNode::make(char op)
 std::unique_ptr<CondTreeNode> CondTreeNode::make(double num)
 {
     return std::unique_ptr<CondTreeNode>(new CondTreeNode(num));
-}
-
-CondTreeNode::~CondTreeNode()
-{
-    removeLeaves();
 }
 
 bool CondTreeNode::isValid() const
