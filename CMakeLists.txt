@@ -35,6 +35,7 @@ add_definitions(-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN)
 ########################################
 set(all_tests
     test_condparser
+    test_condtree
     test_gllsparser
     test_parsercommon
     test_symbollist
@@ -82,7 +83,6 @@ add_executable(test_parsercommon
     src/parsercommon.cc
     src/parsercommon.h
     )
-set_target_properties(test_parsercommon PROPERTIES COMPILE_DEFINITIONS  "BOOST_TEST_MAIN")
 target_link_libraries(test_parsercommon ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 ########################################
@@ -95,6 +95,16 @@ add_executable(test_condparser
     src/parsercommon.h
     src/symbollist.cc
     src/symbollist.h
+    src/condtree.cc
+    src/condtree.h
     )
-set_target_properties(test_condparser PROPERTIES COMPILE_DEFINITIONS "BOOST_TEST_MAIN")
 target_link_libraries(test_condparser ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+
+########################################
+add_test(condtree test_condtree)
+add_executable(test_condtree
+    test/condtree.cc
+    src/condtree.cc
+    src/condtree.h
+    )
+target_link_libraries(test_condtree ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
