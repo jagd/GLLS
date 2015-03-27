@@ -8,6 +8,7 @@ class CondTreeNode
 public:
     enum class Type {INVALID_NODE, ID_NODE, OP_NODE, NUM_NODE};
     CondTreeNode();
+    CondTreeNode(const CondTreeNode &);
     CondTreeNode(CondTreeNode &&) = default;
     explicit CondTreeNode(int id);
     explicit CondTreeNode(char op);
@@ -18,15 +19,14 @@ public:
     bool isTerm() const;
     bool isValid() const;
     Type type;
+    /** non-anonymous union is more convenient for the copy ctor */
     union {
         char op;
         int id;
         double num;
-    };
+    } value;
     std::unique_ptr<CondTreeNode> left;
     std::unique_ptr<CondTreeNode> right;
-private:
-    CondTreeNode(const CondTreeNode &) = delete;
 };
 
 

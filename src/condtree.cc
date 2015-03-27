@@ -6,16 +6,19 @@ CondTreeNode::CondTreeNode() : type(Type::INVALID_NODE)
 {
 }
 
-CondTreeNode::CondTreeNode(char op) : type(Type::OP_NODE), op(op)
+CondTreeNode::CondTreeNode(char op) : type(Type::OP_NODE)
 {
+    value.op = op;
 }
 
-CondTreeNode::CondTreeNode(int id) : type(Type::ID_NODE), id(id)
+CondTreeNode::CondTreeNode(int id) : type(Type::ID_NODE)
 {
+    value.id = id;
 }
 
-CondTreeNode::CondTreeNode(double num) : type(Type::NUM_NODE), num(num)
+CondTreeNode::CondTreeNode(double num) : type(Type::NUM_NODE)
 {
+    value.num = num;
 }
 
 bool CondTreeNode::isTerm() const
@@ -50,4 +53,16 @@ bool CondTreeNode::isValid() const
             && left && right
             && left->isValid() && right->isValid()
         );
+}
+
+CondTreeNode::CondTreeNode(const CondTreeNode &root)
+{
+    type = root.type;
+    value = root.value;
+    if (root.left) {
+        left.reset(new CondTreeNode(*(root.left)));
+    }
+    if (root.right) {
+        right.reset(new CondTreeNode(*(root.right)));
+    }
 }
