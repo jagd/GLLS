@@ -44,7 +44,10 @@ Grammar:
 #define _GENERAL_LINEAR_LEAST_SQUARES_CONDPARSER_H_
 
 #include "symbollist.h"
+#include "condtree.h"
 #include <string>
+#include <vector>
+#include <memory>
 #include <iosfwd>
 
 /**
@@ -100,8 +103,12 @@ private:
 class CondParser {
 public:
     CondParser(std::istream &, const SymbolList &, const std::string &varName);
+//    std::vector<std::unique_ptr<CondTreeNode> > parse() {return parse_conds ();}
 private:
+//    std::vector<std::unique_ptr<CondTreeNode> > parse_conds();
+//    std::unique_ptr<CondTreeNode> parse_expr();
     CondLexer lexer_;
+    CondLexer::Token forward_;
 };
 
 #endif //_GENERAL_LINEAR_LEAST_SQUARES_CONDPARSER_H_

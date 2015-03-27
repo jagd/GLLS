@@ -143,4 +143,20 @@ CondParser::CondParser(
         const std::string &varName
 ) : lexer_(s, CondDict(l, varName))
 {
+    forward_ = lexer_.token();
 }
+
+//std::vector<std::unique_ptr<CondTreeNode> > CondParser::parse_conds()
+//{
+//    typedef std::unique_ptr<CondTreeNode> Tree;
+//    std::vector<Tree> trees;
+//    auto t = parse_expr();
+//    if (t) {
+//        trees.push_back(t);
+//    }
+//}
+//
+//std::unique_ptr<CondTreeNode> CondParser::parse_expr()
+//{
+//    return std::unique_ptr<CondTreeNode>();
+//}
