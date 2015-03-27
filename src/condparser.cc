@@ -59,7 +59,7 @@ CondLexer::CondLexer(std::istream &s, CondDict &&d)
 CondLexer::Token CondLexer::token()
 {
     stream_ >> std::ws;
-    int peek = stream_.peek();
+    int peek = static_cast<int>(stream_.get());
     if (peek == EOF) {
         return Token::TK_EOF;
     } else if (std::isalpha(peek)) {
@@ -76,10 +76,12 @@ CondLexer::Token CondLexer::token()
         case '(':
         case ')':
         case '=':
-            symbol_ = stream_.get();
+            symbol_ = static_cast<int>(stream_.get());
             return Token::TK_OP;
+        default:
+            break;
     }
-    symbol_ = stream_.get();
+    symbol_ = static_cast<int>(stream_.get());
     msg_ = "invalid symbol ";
     msg_ += static_cast<char>(symbol_);
     return Token::TK_INVALID;
@@ -87,8 +89,8 @@ CondLexer::Token CondLexer::token()
 
 CondLexer::Token CondLexer::peekMinusOrPlus()
 {
-    const int ch = stream_.get();
-    if (std::isdigit(stream_.peek())){
+    const int ch = static_cast<int>(stream_.get());
+    if (std::isdigit(static_cast<int>(stream_.get()))){
         if (!(stream_ >> num_)) {
             msg_ = std::string("not a valid number after '")
                     + static_cast<char>(ch) + "' sign";
@@ -108,11 +110,11 @@ CondLexer::Token CondLexer::peekAlpha()
 {
     std::string name;
     std::string numstr;
-    while (std::isalpha(stream_.peek())) {
-        name.push_back(stream_.get());
+    while (std::isalpha(static_cast<char>(stream_.get()))) {
+        name.push_back(static_cast<char>(stream_.get()));
     }
-    while (std::isdigit(stream_.peek())) {
-        numstr.push_back(stream_.get());
+    while (std::isdigit(static_cast<char>(stream_.get()))) {
+        numstr.push_back(static_cast<char>(stream_.get()));
     }
     if (numstr.empty()) {
         msg_ = name + " should follow an integer index";
