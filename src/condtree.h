@@ -31,4 +31,17 @@ public:
 };
 
 
+/**
+    @brief a copyable condition tree
+*/
+class CondTree
+{
+public:
+    CondTree();
+    CondTree(const CondTree &ct);
+    CondTree(CondTree &&) = default;
+    std::unique_ptr<CondTreeNode> root;
+};
+
+
 #endif //_GENERAL_LINEAR_LEAST_SQUARES_CONDTREE_H_

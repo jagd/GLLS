@@ -1,6 +1,7 @@
 #include "condtree.h"
 
 #include <memory>
+#include <cassert>
 
 CondTreeNode::CondTreeNode() : type(Type::INVALID_NODE)
 {
@@ -70,4 +71,14 @@ CondTreeNode::CondTreeNode(const CondTreeNode &root)
 std::unique_ptr<CondTreeNode> CondTreeNode::clone() const
 {
     return std::unique_ptr<CondTreeNode>(new CondTreeNode(*this));
+}
+
+CondTree::CondTree() : root(new CondTreeNode())
+{
+}
+
+CondTree::CondTree(const CondTree &ct)
+{
+    assert(ct.root);
+    root = ct.root->clone();
 }

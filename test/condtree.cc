@@ -5,6 +5,7 @@
 #define BOOST_TEST_MODULE CondTree
 #endif
 #include <boost/test/unit_test.hpp>
+#include <memory>
 
 BOOST_AUTO_TEST_SUITE()
 
@@ -23,6 +24,15 @@ BOOST_AUTO_TEST_SUITE()
         root->left = CondTreeNode::make('-');
         BOOST_CHECK(!root->isValid());
         BOOST_CHECK(c->isValid());
+    }
+
+    BOOST_AUTO_TEST_CASE(CtorTree) {
+        BOOST_CHECK_NO_THROW(CondTree());
+        auto x = CondTree();
+        auto y = x;
+        BOOST_CHECK(x.root);
+        auto z = std::move(x);
+        BOOST_CHECK(!x.root);
     }
 
     BOOST_AUTO_TEST_CASE(IsTerm_1) {
