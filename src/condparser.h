@@ -103,10 +103,11 @@ private:
 class CondParser {
 public:
     CondParser(std::istream &, const SymbolList &, const std::string &varName);
-//    std::vector<std::unique_ptr<CondTreeNode> > parse() {return parse_conds ();}
+    std::vector<CondTree> parse();
 private:
-//    std::vector<std::unique_ptr<CondTreeNode> > parse_conds();
-//    std::unique_ptr<CondTreeNode> parse_expr();
+    std::vector<CondTree> parse_conds();
+    std::vector<CondTree> parse_cond();
+    CondTree parse_expr();
     CondLexer lexer_;
     CondLexer::Token forward_;
 };

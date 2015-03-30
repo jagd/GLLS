@@ -82,3 +82,7 @@ CondTree::CondTree(const CondTree &ct)
     assert(ct.root);
     root = ct.root->clone();
 }
+
+CondTree::CondTree(std::unique_ptr<CondTreeNode> r) : root(std::move(r))
+{
+}

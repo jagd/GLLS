@@ -12,6 +12,16 @@
 //constexpr int CondDict::ID_VAR_BASE;
 //constexpr int CondDict::ID_SYM_BASE;
 
+CondTree build_equation(const CondTree &a, const CondTree &b)
+{
+    std::unique_ptr<CondTreeNode> root(new CondTreeNode('+'));
+    root->right = std::unique_ptr<CondTreeNode>(new CondTreeNode('*'));
+    root->right->left = std::unique_ptr<CondTreeNode>(new CondTreeNode(-1.0));
+    root->right->right = b.root->clone();
+    root->left = a.root->clone();
+    return CondTree(std::move(root));
+}
+
 CondDict::CondDict(const SymbolList &sl, const std::string &varName)
     : varName_(varName), symList_(sl)
 {
@@ -146,17 +156,48 @@ CondParser::CondParser(
     forward_ = lexer_.token();
 }
 
-//std::vector<std::unique_ptr<CondTreeNode> > CondParser::parse_conds()
-//{
-//    typedef std::unique_ptr<CondTreeNode> Tree;
-//    std::vector<Tree> trees;
-//    auto t = parse_expr();
-//    if (t) {
-//        trees.push_back(t);
-//    }
-//}
-//
-//std::unique_ptr<CondTreeNode> CondParser::parse_expr()
-//{
-//    return std::unique_ptr<CondTreeNode>();
-//}
+std::vector<CondTree> CondParser::parse_cond()
+{
+    std::vector<CondTree> trees;
+    while (forward_ == CondLexer::Token::TK_OP && lexer_.symbol() == '=') {
+        forward_ = lexer_.token();
+        trees.push_back(parse_expr());
+    }
+    return trees;
+}
+
+CondTree CondParser::parse_expr()
+{
+    // TODO
+}
+
+std::vector<CondTree> CondParser::parse_conds()
+{
+    const auto a = parse_expr();
+    auto eqn = parse_cond();
+    if (eqn.empty()) {
+        throw ParserError(
+                0,
+                "expect at least one equation",
+                ParserError::Type::SEMANTIC_ERROR
+        );
+    }
+    for (auto &x : eqn) {
+        x = build_equation(a, x);
+    }
+    return eqn;
+}
+
+std::vector<CondTree> CondParser::parse()
+{
+    const auto r = parse_conds();
+    if (forward_ != CondLexer::Token::TK_EOF) {
+        throw ParserError(
+                0,
+                "unrecognized content: " + lexer_.msg(),
+                ParserError::Type::UNEXPECTED_CHAR
+        );
+    }
+    return r;
+}
+

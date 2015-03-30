@@ -30,6 +30,7 @@ public:
         EXPECT_CHAR,
         EXPECT_DIGIT,
         INVALID_TOKEN,
+        SEMANTIC_ERROR,
     };
     ParserError(
             int line,

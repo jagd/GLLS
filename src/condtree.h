@@ -30,7 +30,6 @@ public:
     std::unique_ptr<CondTreeNode> right;
 };
 
-
 /**
     @brief a copyable condition tree
 */
@@ -38,8 +37,11 @@ class CondTree
 {
 public:
     CondTree();
+    CondTree(std::unique_ptr<CondTreeNode> r);
     CondTree(const CondTree &ct);
     CondTree(CondTree &&) = default;
+    CondTree& operator=(CondTree &&) = default;
+    CondTree& operator=(const CondTree &) = default;
     std::unique_ptr<CondTreeNode> root;
 };
 
