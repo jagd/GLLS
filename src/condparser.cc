@@ -156,25 +156,35 @@ CondParser::CondParser(
     forward_ = lexer_.token();
 }
 
-std::vector<CondTree> CondParser::parse_cond()
+std::vector<CondTree> CondParser::parseCondMiddle()
 {
     std::vector<CondTree> trees;
     while (forward_ == CondLexer::Token::TK_OP && lexer_.symbol() == '=') {
         forward_ = lexer_.token();
-        trees.push_back(parse_expr());
+        trees.push_back(parseExpr());
     }
     return trees;
 }
 
-CondTree CondParser::parse_expr()
+std::unique_ptr<CondTreeNode> CondParser::parseExpr()
 {
-    // TODO
+    std::unique_ptr<CondTreeNode> t = parseTerm();
+    if ( forward_ == CondLexer::Token::TK_OP
+      && (lexer_.symbol() == '+' || lexer_.symbol() == '-') )
+    {
+        forward_ = lexer_.token();
+        auto r = CondTreeNode::make(static_cast<char>(lexer_.symbol()));
+        r->left = std::move(t);
+        r->right = parseTerm();
+        return r;
+    }
+    return t;
 }
 
-std::vector<CondTree> CondParser::parse_conds()
+std::vector<CondTree> CondParser::parseCond()
 {
-    const auto a = parse_expr();
-    auto eqn = parse_cond();
+    const CondTree a(parseExpr());
+    auto eqn = parseCondMiddle();
     if (eqn.empty()) {
         throw ParserError(
                 0,
@@ -190,7 +200,7 @@ std::vector<CondTree> CondParser::parse_conds()
 
 std::vector<CondTree> CondParser::parse()
 {
-    const auto r = parse_conds();
+    const auto r = parseCond();
     if (forward_ != CondLexer::Token::TK_EOF) {
         throw ParserError(
                 0,
@@ -201,3 +211,78 @@ std::vector<CondTree> CondParser::parse()
     return r;
 }
 
+std::unique_ptr<CondTreeNode> CondParser::parseTerm()
+{
+    auto a = parseAtom();
+    if (forward_ == CondLexer::Token::TK_OP
+        && (lexer_.symbol() == '*' || lexer_.symbol() == '/')
+    ) {
+        forward_ = lexer_.token();
+        auto r = CondTreeNode::make(static_cast<char>(lexer_.symbol()));
+        r->left = std::move(a);
+        r->right = parseTerm();
+        return r;
+    }
+    return a;
+}
+
+std::unique_ptr<CondTreeNode> CondParser::parseAtom()
+{
+    if (forward_ == CondLexer::Token::TK_OP && lexer_.symbol() == '-') {
+        forward_ = lexer_.token();
+        auto r = CondTreeNode::make('*');
+        r->left = CondTreeNode::make(-1.0);
+        r->right = parseAtomTail();
+        return r;
+    }
+    return parseAtomTail();
+}
+
+std::unique_ptr<CondTreeNode> CondParser::parseAtomTail()
+{
+    switch (forward_) {
+        case CondLexer::Token::TK_ID: {
+            const auto sym = lexer_.symbol();
+            forward_ = lexer_.token();
+            return CondTreeNode::make(sym);
+        };
+        case CondLexer::Token::TK_NUM: {
+            const auto num = lexer_.num();
+            forward_ = lexer_.token();
+            return CondTreeNode::make(num);
+        };
+        case CondLexer::Token::TK_INVALID:
+            throw ParserError(
+                    0,
+                    "invalid token " + lexer_.msg(),
+                    ParserError::Type::INVALID_TOKEN
+            );
+        case CondLexer::Token::TK_OP:
+            if (lexer_.symbol() == '(') {
+                forward_ = lexer_.token();
+                auto expr = parseExpr();
+                if ( forward_ != CondLexer::Token::TK_OP
+                  || lexer_.symbol() !=  ')' ) {
+                    throw ParserError(
+                            0,
+                            "missing or unmatched ')'",
+                            ParserError::Type::EXPECT_CHAR
+                    );
+                    forward_ = lexer_.token();
+                }
+            } else {
+                throw ParserError(
+                        0,
+                        "unexpected operator " + lexer_.msg(),
+                        ParserError::Type::EXPECT_CHAR
+                );
+            }
+        //case CondLexer::Token::TK_EOF:
+        default:
+            throw ParserError(
+                    0,
+                    "unexpected EOF",
+                    ParserError::Type::UNEXPECTED_EOF
+            );
+    }
+}

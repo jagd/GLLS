@@ -6,11 +6,11 @@
 
 Grammar:
 
-    conds       := expr cond
+    cond        := expr cond_middle
 
-    cond        := '=' expr cond_tail
+    cond_middle := '=' expr cond_middle
 
-    cond_tail   := cond
+    cond_tail   := cond_middle
                  | epsilon
 
     expr        := term expr_tail
@@ -103,13 +103,17 @@ private:
 class CondParser {
 public:
     CondParser(std::istream &, const SymbolList &, const std::string &varName);
+    /** brief the main parse function */
     std::vector<CondTree> parse();
 private:
-    std::vector<CondTree> parse_conds();
-    std::vector<CondTree> parse_cond();
-    CondTree parse_expr();
     CondLexer lexer_;
     CondLexer::Token forward_;
+    std::vector<CondTree> parseCond();
+    std::vector<CondTree> parseCondMiddle();
+    std::unique_ptr<CondTreeNode> parseExpr();
+    std::unique_ptr<CondTreeNode> parseTerm();
+    std::unique_ptr<CondTreeNode> parseAtom();
+    std::unique_ptr<CondTreeNode> parseAtomTail();
 };
 
 #endif //_GENERAL_LINEAR_LEAST_SQUARES_CONDPARSER_H_

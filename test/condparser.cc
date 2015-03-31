@@ -278,4 +278,15 @@ BOOST_AUTO_TEST_SUITE(TestCondParser)
         BOOST_CHECK_THROW(CondParser(ss, sl, ""), std::exception);
     }
 
+    BOOST_AUTO_TEST_CASE(NumberOfEquation) {
+        std::istringstream ss("1 = 2 = 3");
+        auto sl = SymbolList();
+        auto p = CondParser(ss, sl, "x");
+        const auto t = p.parse();
+        BOOST_CHECK_EQUAL(t.size(), 2);
+        for (const auto x : t) {
+            BOOST_CHECK(x.root->isValid());
+        }
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
