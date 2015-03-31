@@ -248,6 +248,7 @@ std::unique_ptr<CondTreeNode> CondParser::parseAtomTail()
                     );
                 }
                 forward_ = lexer_.token();
+                return expr;
             } else {
                 throw ParserError(
                         0,
