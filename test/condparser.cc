@@ -1,6 +1,7 @@
 #include "../src/parsercommon.h"
 #include "../src/symbollist.h"
 #include "../src/condparser.h"
+#include "../src/condtree.h"
 #include <sstream>
 
 #ifndef BOOST_TEST_DYN_LINK
@@ -283,9 +284,12 @@ BOOST_AUTO_TEST_SUITE(TestCondParser)
         auto sl = SymbolList();
         auto p = CondParser(ss, sl, "x");
         const auto t = p.parse();
-        BOOST_CHECK_EQUAL(t.size(), 2);
+        BOOST_REQUIRE_EQUAL(t.size(), 2);
         for (const auto x : t) {
+            BOOST_REQUIRE(x.root);
             BOOST_CHECK(x.root->isValid());
+            BOOST_REQUIRE(x.root->type == CondTreeNode::Type::OP_NODE);
+            BOOST_CHECK_EQUAL(x.root->value.op, '-');
         }
     }
 
