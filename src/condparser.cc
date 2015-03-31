@@ -14,11 +14,9 @@
 
 CondTree build_equation(const CondTree &a, const CondTree &b)
 {
-    std::unique_ptr<CondTreeNode> root(new CondTreeNode('+'));
-    root->right = std::unique_ptr<CondTreeNode>(new CondTreeNode('*'));
-    root->right->left = std::unique_ptr<CondTreeNode>(new CondTreeNode(-1.0));
-    root->right->right = b.root->clone();
+    std::unique_ptr<CondTreeNode> root(new CondTreeNode('-'));
     root->left = a.root->clone();
+    root->right = b.root->clone();
     return CondTree(std::move(root));
 }
 
