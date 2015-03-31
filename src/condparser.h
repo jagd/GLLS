@@ -8,7 +8,7 @@ Grammar:
 
     cond        := expr cond_middle
 
-    cond_middle := '=' expr cond_middle
+    cond_middle := '=' expr cond_tail
 
     cond_tail   := cond_middle
                  | epsilon

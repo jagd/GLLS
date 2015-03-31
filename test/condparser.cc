@@ -293,4 +293,24 @@ BOOST_AUTO_TEST_SUITE(TestCondParser)
         }
     }
 
+    BOOST_AUTO_TEST_CASE(ValidCases) {
+        const char *buf[] = {
+                "1 = 2 = 3",
+                "1 = x1+2 = y0-4e3",
+        };
+        auto sl = SymbolList();
+        sl.insert("y");
+        sl.insert("z");
+        for (const auto s : buf) {
+            std::istringstream ss(s);
+            BOOST_TEST_CHECKPOINT("parsing " << s);
+            for (const auto x : CondParser(ss, sl, "x").parse()) {
+                BOOST_REQUIRE(x.root);
+                BOOST_CHECK(x.root->isValid());
+                BOOST_REQUIRE(x.root->type == CondTreeNode::Type::OP_NODE);
+                BOOST_CHECK_EQUAL(x.root->value.op, '-');
+            }
+        }
+    }
+
 BOOST_AUTO_TEST_SUITE_END()

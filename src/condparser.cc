@@ -266,8 +266,8 @@ std::unique_ptr<CondTreeNode> CondParser::parseAtomTail()
                             "missing or unmatched ')'",
                             ParserError::Type::EXPECT_CHAR
                     );
-                    forward_ = lexer_.token();
                 }
+                forward_ = lexer_.token();
             } else {
                 throw ParserError(
                         0,
