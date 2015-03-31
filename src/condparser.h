@@ -29,12 +29,12 @@ Grammar:
                  | atom_tail
 
     atom_tail   := id
-                 | number
+                 | posiive_number
                  | '(' expr ')'
 
     id          := [a-zA-Z]+ [0-9]+
 
-    number      :=  [+-] [0-9]+ (\.[0-9]+)? ([eE][-+]?[0-9]+)?
+    positive_number :=  [0-9]+ (\.[0-9]+)? ([eE][-+]?[0-9]+)?
 
 ========================================
 
@@ -88,7 +88,6 @@ public:
     Token token();
 private:
     std::istream &stream_;
-    Token peekMinusOrPlus();
     Token peekAlpha();
     double num_;
     /***

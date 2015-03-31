@@ -78,7 +78,6 @@ CondLexer::Token CondLexer::token()
     } else switch (peek) {
         case '-':
         case '+':
-            return peekMinusOrPlus();
         case '*':
         case '/':
         case '(':
@@ -93,25 +92,6 @@ CondLexer::Token CondLexer::token()
     msg_ = "invalid symbol ";
     msg_ += static_cast<char>(symbol_);
     return Token::TK_INVALID;
-}
-
-CondLexer::Token CondLexer::peekMinusOrPlus()
-{
-    const int ch = static_cast<int>(stream_.get());
-    if (std::isdigit(static_cast<int>(stream_.peek()))){
-        if (!(stream_ >> num_)) {
-            msg_ = std::string("not a valid number after '")
-                    + static_cast<char>(ch) + "' sign";
-            return Token::TK_INVALID;
-        }
-        if (ch == '-') {
-            num_ = -num_;
-        }
-        return Token::TK_NUM;
-    } else {
-        symbol_ = ch;
-        return Token::TK_OP;
-    }
 }
 
 CondLexer::Token CondLexer::peekAlpha()
