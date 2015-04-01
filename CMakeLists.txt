@@ -48,7 +48,7 @@ add_custom_target(coverage
     COMMAND ${CMAKE_CTEST_COMMAND}
     COMMAND ${LCOV} -d . -c -o coverage_all.txt
     COMMAND ${LCOV} -r coverage_all.txt 'test/*' '/usr/*' -o coverage_src.txt
-    COMMAND ${GENHTML} -o coverage_report coverage_src.txt
+    COMMAND ${GENHTML} --demangle-cpp -o coverage_report coverage_src.txt
     COMMAND ${CMAKE_COMMAND} -E remove coverage_all.txt coverage_src.txt
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     DEPENDS ${all_tests}
