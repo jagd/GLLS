@@ -310,10 +310,13 @@ BOOST_AUTO_TEST_SUITE(TestCondParser)
 
     BOOST_AUTO_TEST_CASE(ValidCases) {
         const char *buf[] = {
-                "1 = 2 = 3",
+                "1 = y3 = x4",
                 "1 = x1+2 = y0-4e3",
                 "(x0) = (x0*1+x1+2)*x9 ",
                 "(x0+3.14)/4 = (x0*1/x1+2)*x9",
+                "(x0+3.14)/-4 = ((-1*x0*3+5)/x1+2)*x9",
+                "(x0*2*1*y1+3.14)/-4 = ((-1*x0*3+5)/x1+2)*x9",
+                "1 - -1 = y3",
         };
         auto sl = SymbolList();
         sl.insert("y");
