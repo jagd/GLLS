@@ -1,5 +1,6 @@
 #include "../src/parsercommon.h"
 #include <sstream>
+#include <stdexcept>
 
 #ifndef BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE ParserCommon
@@ -90,6 +91,11 @@ BOOST_AUTO_TEST_SUITE(TestParserError)
 
     BOOST_AUTO_TEST_CASE(Ctor) {
         BOOST_CHECK_NO_THROW(ParserError(1, ""));
+    }
+
+    BOOST_AUTO_TEST_CASE(ChildDtor) {
+        std::exception *e = new ParserError(1, "");
+        delete e;
     }
 
 BOOST_AUTO_TEST_SUITE_END()
