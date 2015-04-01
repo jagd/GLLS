@@ -69,6 +69,7 @@ CondLexer::Token CondLexer::token()
     stream_ >> std::ws;
     const int peek = static_cast<int>(stream_.peek());
     if (peek == std::istream::traits_type::eof()) {
+        msg_ = "EOF";
         return Token::TK_EOF;
     } else if (std::isalpha(peek)) {
         return peekAlpha();
@@ -84,14 +85,15 @@ CondLexer::Token CondLexer::token()
         case ')':
         case '=':
             symbol_ = static_cast<int>(stream_.get());
+            msg_ = symbol();
             return Token::TK_OP;
         default:
-            break;
+            symbol_ = static_cast<int>(stream_.get());
+            msg_ = "invalid symbol ";
+            msg_ += static_cast<char>(symbol_);
+            return Token::TK_INVALID;
     }
-    symbol_ = static_cast<int>(stream_.get());
-    msg_ = "invalid symbol ";
-    msg_ += static_cast<char>(symbol_);
-    return Token::TK_INVALID;
+    assert("code" == "unreachable");
 }
 
 CondLexer::Token CondLexer::peekAlpha()
