@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_SUITE(TestCondParser)
                 "1 = 2 = 3",
                 "1 = x1+2 = y0-4e3",
                 "(x0) = (x0*1+x1+2)*x9 ",
-                "(x0+3.14)/4 = (x0*1/x1+2)*x9"
+                "(x0+3.14)/4 = (x0*1/x1+2)*x9",
         };
         auto sl = SymbolList();
         sl.insert("y");

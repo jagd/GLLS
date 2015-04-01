@@ -153,7 +153,7 @@ std::unique_ptr<CondTreeNode> CondParser::parseExpr()
         forward_ = lexer_.token();
         auto r = CondTreeNode::make(static_cast<char>(lexer_.symbol()));
         r->left = std::move(t);
-        r->right = parseTerm();
+        r->right = parseExpr();
         return r;
     }
     return t;
