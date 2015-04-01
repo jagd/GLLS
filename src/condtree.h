@@ -17,6 +17,7 @@ public:
     static std::unique_ptr<CondTreeNode> make(int id);
     static std::unique_ptr<CondTreeNode> make(char op);
     static std::unique_ptr<CondTreeNode> make(double num);
+    bool isOp(char op) const { return type == Type::OP_NODE && value.op == op; }
     bool isTerm() const;
     bool isValid() const;
     Type type;
