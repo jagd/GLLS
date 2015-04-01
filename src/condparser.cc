@@ -85,7 +85,7 @@ CondLexer::Token CondLexer::token()
         case ')':
         case '=':
             symbol_ = static_cast<int>(stream_.get());
-            msg_ = symbol();
+            msg_ = static_cast<char>(symbol_);
             return Token::TK_OP;
         default:
             symbol_ = static_cast<int>(stream_.get());
@@ -93,7 +93,7 @@ CondLexer::Token CondLexer::token()
             msg_ += static_cast<char>(symbol_);
             return Token::TK_INVALID;
     }
-    assert("code" == "unreachable");
+    assert(!"code should be unreachable");
 }
 
 CondLexer::Token CondLexer::peekAlpha()

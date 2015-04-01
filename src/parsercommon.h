@@ -37,6 +37,7 @@ public:
             const std::string &msg,
             Type t = Type::UNKNOWN
     );
+    virtual ~ParserError() override = default;
     virtual const char *what() const noexcept override;
     int line() const { return line_; }
     const std::string &msg() const { return msg_; }

@@ -85,3 +85,11 @@ BOOST_AUTO_TEST_SUITE(TestNextLine)
     }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(TestParserError)
+
+    BOOST_AUTO_TEST_CASE(Ctor) {
+        BOOST_CHECK_NO_THROW(ParserError(1, ""));
+    }
+
+BOOST_AUTO_TEST_SUITE_END()

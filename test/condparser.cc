@@ -308,7 +308,7 @@ BOOST_AUTO_TEST_SUITE(TestCondParser)
         }
     }
 
-    BOOST_AUTO_TEST_CASE(ValidCases) {
+    BOOST_AUTO_TEST_CASE(VariousValidCases) {
         const char *buf[] = {
                 "1 = y3 = x4",
                 "1 = x1+2 = y0-4e3",
@@ -331,6 +331,102 @@ BOOST_AUTO_TEST_SUITE(TestCondParser)
                 BOOST_CHECK_EQUAL(x.root->value.op, '-');
             }
         }
+    }
+
+    BOOST_AUTO_TEST_CASE(InvalidCase_NotAnEquation) {
+            auto sl = SymbolList();
+            sl.insert("y");
+            sl.insert("z");
+            char s[] = "1+1";
+            std::istringstream ss(s);
+            BOOST_TEST_CHECKPOINT("parsing " << s);
+            BOOST_CHECK_EXCEPTION(
+                CondParser(ss, sl, "x").parse(),
+                ParserError,
+                [](const ParserError &e) {
+                    return e.type() == ParserError::Type::SEMANTIC_ERROR;
+                }
+            );
+    }
+
+    BOOST_AUTO_TEST_CASE(InvalidCase_EndOfCondition) {
+            auto sl = SymbolList();
+            sl.insert("y");
+            sl.insert("z");
+            char s[] = "1+1 = y0 z0";
+            std::istringstream ss(s);
+            BOOST_TEST_CHECKPOINT("parsing " << s);
+            BOOST_CHECK_EXCEPTION(
+                CondParser(ss, sl, "x").parse(),
+                ParserError,
+                [](const ParserError &e) {
+                    return e.type() == ParserError::Type::UNEXPECTED_CHAR;
+                }
+            );
+    }
+
+    BOOST_AUTO_TEST_CASE(InvalidCase_InvalidToken) {
+            auto sl = SymbolList();
+            sl.insert("y");
+            sl.insert("z");
+            char s[] = "Y";
+            std::istringstream ss(s);
+            BOOST_TEST_CHECKPOINT("parsing " << s);
+            BOOST_CHECK_EXCEPTION(
+                CondParser(ss, sl, "x").parse(),
+                ParserError,
+                [](const ParserError &e) {
+                    return e.type() == ParserError::Type::INVALID_TOKEN;
+                }
+            );
+    }
+
+    BOOST_AUTO_TEST_CASE(InvalidCase_MismatchRightParethesis) {
+            auto sl = SymbolList();
+            sl.insert("y");
+            sl.insert("z");
+            char s[] = "(1+2=";
+            std::istringstream ss(s);
+            BOOST_TEST_CHECKPOINT("parsing " << s);
+            BOOST_CHECK_EXCEPTION(
+            CondParser(ss, sl, "x").parse(),
+                ParserError,
+                [](const ParserError &e) {
+                    return e.type() == ParserError::Type::EXPECT_CHAR;
+                }
+            );
+    }
+
+    BOOST_AUTO_TEST_CASE(InvalidCase_EOF) {
+            auto sl = SymbolList();
+            sl.insert("y");
+            sl.insert("z");
+            char s[] = "1+2=";
+            std::istringstream ss(s);
+            BOOST_TEST_CHECKPOINT("parsing " << s);
+            BOOST_CHECK_EXCEPTION(
+            CondParser(ss, sl, "x").parse(),
+                ParserError,
+                [](const ParserError &e) {
+                    return e.type() == ParserError::Type::UNEXPECTED_EOF;
+                }
+            );
+    }
+
+    BOOST_AUTO_TEST_CASE(InvalidCase_ExpectTerm) {
+            auto sl = SymbolList();
+            sl.insert("y");
+            sl.insert("z");
+            char s[] = "(=";
+            std::istringstream ss(s);
+            BOOST_TEST_CHECKPOINT("parsing " << s);
+            BOOST_CHECK_EXCEPTION(
+                CondParser(ss, sl, "x").parse(),
+                ParserError,
+                [](const ParserError &e) {
+                    return e.type() == ParserError::Type::EXPECT_CHAR;
+                }
+            );
     }
 
 BOOST_AUTO_TEST_SUITE_END()
