@@ -73,7 +73,7 @@ CondLexer::Token CondLexer::token()
         return Token::TK_EOF;
     } else if (std::isalpha(peek)) {
         return peekAlpha();
-    } else if (std::isdigit(peek)) {
+        } else if (std::isdigit(peek)) {
         stream_ >> num_;
         return Token::TK_NUM;
     } else switch (peek) {
@@ -152,8 +152,8 @@ std::unique_ptr<CondTreeNode> CondParser::parseExpr()
     if ( forward_ == CondLexer::Token::TK_OP
       && (lexer_.symbol() == '+' || lexer_.symbol() == '-') )
     {
-        forward_ = lexer_.token();
         auto r = CondTreeNode::make(static_cast<char>(lexer_.symbol()));
+        forward_ = lexer_.token();
         r->left = std::move(t);
         r->right = parseExpr();
         return r;
@@ -197,8 +197,8 @@ std::unique_ptr<CondTreeNode> CondParser::parseTerm()
     if (forward_ == CondLexer::Token::TK_OP
         && (lexer_.symbol() == '*' || lexer_.symbol() == '/')
     ) {
-        forward_ = lexer_.token();
         auto r = CondTreeNode::make(static_cast<char>(lexer_.symbol()));
+        forward_ = lexer_.token();
         r->left = std::move(a);
         r->right = parseTerm();
         return r;
