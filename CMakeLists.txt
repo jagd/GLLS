@@ -106,5 +106,11 @@ add_executable(test_condtree
     test/condtree.cc
     src/condtree.cc
     src/condtree.h
+    src/condparser.cc
+    src/condparser.h
+    src/parsercommon.cc
+    src/parsercommon.h
+    src/symbollist.cc
+    src/symbollist.h
     )
 target_link_libraries(test_condtree ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})

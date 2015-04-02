@@ -86,3 +86,36 @@ CondTree::CondTree(const CondTree &ct)
 CondTree::CondTree(std::unique_ptr<CondTreeNode> r) : root(std::move(r))
 {
 }
+
+static bool isFinalFormImpl(const std::unique_ptr<CondTreeNode> &root)
+{
+    switch (root->type) {
+        case CondTreeNode::Type::ID_NODE:
+            return root->isTerm();
+        case CondTreeNode::Type::NUM_NODE:
+            return root->isTerm();
+        case CondTreeNode::Type::OP_NODE:
+            switch (root->value.op) {
+                case '+':
+                    return isFinalForm(root->left) && isFinalForm(root->right);
+                case '*':
+                    return root->left->type == CondTreeNode::Type::NUM_NODE
+                        && root->right->type == CondTreeNode::Type::ID_NODE;
+                default:
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
+    return false;
+}
+
+bool isFinalForm(const std::unique_ptr<CondTreeNode> &root)
+{
+    if (!(root && root->isValid())) {
+        return false;
+    }
+    return isFinalFormImpl(root);
+}
+

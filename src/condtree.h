@@ -46,5 +46,10 @@ public:
     std::unique_ptr<CondTreeNode> root;
 };
 
+bool isFinalForm(const std::unique_ptr<CondTreeNode> &);
+inline bool isFinalForm(const CondTree &tree)
+{
+    return isFinalForm(tree.root);
+}
 
 #endif //_GENERAL_LINEAR_LEAST_SQUARES_CONDTREE_H_

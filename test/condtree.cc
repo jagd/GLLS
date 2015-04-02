@@ -1,4 +1,7 @@
 #include "../src/condtree.h"
+#include "../src/condparser.h"
+#include "../src/symbollist.h"
+#include "../src/parsercommon.h"
 #include <memory>
 
 #ifndef BOOST_TEST_DYN_LINK
@@ -7,7 +10,7 @@
 #include <boost/test/unit_test.hpp>
 #include <memory>
 
-BOOST_AUTO_TEST_SUITE()
+BOOST_AUTO_TEST_SUITE(TestCondTree)
 
     BOOST_AUTO_TEST_CASE(Ctor) {
         BOOST_CHECK(CondTreeNode().type == CondTreeNode::Type::INVALID_NODE);
@@ -64,6 +67,53 @@ BOOST_AUTO_TEST_SUITE()
         BOOST_CHECK(!root->isValid());
         root->right = CondTreeNode::make(-1.0);
         BOOST_CHECK(root->isValid());
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(TestValidForm)
+
+    BOOST_AUTO_TEST_CASE(TestValid) {
+        const char *buf[] = {
+                "1 = y3 = x4",
+                "1+1 = y3+z12 = 5*y4",
+                "1+1 = 3*y3+3*z12 + 3 = 5 + 2*z3",
+        };
+        auto sl = SymbolList();
+        sl.insert("y");
+        sl.insert("z");
+        for (const auto s : buf) {
+            std::istringstream ss(s);
+            BOOST_TEST_CHECKPOINT("parsing " << s);
+            for (const auto x : CondParser(ss, sl, "x").parse()) {
+                // since the root node is '=', we check the both side
+                isFinalForm(x.root->left);
+                BOOST_CHECK(isFinalForm(x.root->left));
+                BOOST_TEST_PASSPOINT();
+                BOOST_CHECK(isFinalForm(x.root->right));
+            }
+        }
+    }
+
+    BOOST_AUTO_TEST_CASE(TestInvalid) {
+        const char *buf[] = {
+                "1*1 = y3*2 = (1+1)*x4",
+                "1+y3*3+z12 = 3*5*z4",
+                "1+y3*(3+z12) = 5*z4*4",
+        };
+        auto sl = SymbolList();
+        sl.insert("y");
+        sl.insert("z");
+        for (const auto s : buf) {
+            std::istringstream ss(s);
+            BOOST_TEST_CHECKPOINT("parsing " << s);
+            for (const auto x : CondParser(ss, sl, "x").parse()) {
+                // since the root node is '=', we check the both side
+                BOOST_CHECK(!isFinalForm(x.root->left));
+                BOOST_TEST_PASSPOINT();
+                BOOST_CHECK(!isFinalForm(x.root->right));
+            }
+        }
     }
 
 BOOST_AUTO_TEST_SUITE_END()
