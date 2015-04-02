@@ -87,7 +87,6 @@ BOOST_AUTO_TEST_SUITE(TestValidForm)
             BOOST_TEST_CHECKPOINT("parsing " << s);
             for (const auto x : CondParser(ss, sl, "x").parse()) {
                 // since the root node is '=', we check the both side
-                isFinalForm(x.root->left);
                 BOOST_CHECK(isFinalForm(x.root->left));
                 BOOST_TEST_PASSPOINT();
                 BOOST_CHECK(isFinalForm(x.root->right));
@@ -118,6 +117,30 @@ BOOST_AUTO_TEST_SUITE(TestValidForm)
         BOOST_CHECK(!isFinalForm(CondTreeNode::make('+')));
         std::unique_ptr<CondTreeNode> p(new CondTreeNode);
         BOOST_CHECK(!isFinalForm(p));
+    }
+
+    BOOST_AUTO_TEST_CASE(TestFinalizable) {
+        const char *buf[] = {
+//                "1 = 1",
+//                "1+x1 = 1+y2",
+//                "1+x1 = 1-y2",
+//                "1+x1 = (1-y2)+z1",
+        "1 + x0 = 3"
+        };
+        auto sl = SymbolList();
+        sl.insert("y");
+        sl.insert("z");
+        for (const auto s : buf) {
+            std::istringstream ss(s);
+            for (auto x : CondParser(ss, sl, "x").parse()) {
+                BOOST_TEST_CHECKPOINT("parsing " << s);
+                BOOST_CHECK(!isFinalForm(x.root));
+                BOOST_TEST_PASSPOINT();
+                BOOST_CHECK(finalizeTree(x) == FinalizationStatus::SUCCESS);
+                BOOST_TEST_PASSPOINT();
+                BOOST_CHECK(isFinalForm(x.root));
+            }
+        }
     }
 
 BOOST_AUTO_TEST_SUITE_END()

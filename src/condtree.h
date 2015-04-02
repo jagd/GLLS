@@ -54,12 +54,15 @@ inline bool isFinalForm(const CondTree &tree)
 }
 
 enum class FinalizationStatus
-{SUCCESS, UNKNOWN_FAILURE, INVALID_EXPRESSION, INVALID_OPERATOR};
+{
+    SUCCESS,            UNKNOWN_FAILURE,            INVALID_EXPRESSION,
+    INVALID_OPERATOR,   NON_LINEAR
+};
 
 FinalizationStatus finalizeTree(std::unique_ptr<CondTreeNode> &);
 inline FinalizationStatus finalizeTree(CondTree &tree)
 {
-    return finalizeTree(tree->root);
+    return finalizeTree(tree.root);
 }
 
 #endif //_GENERAL_LINEAR_LEAST_SQUARES_CONDTREE_H_

@@ -128,6 +128,7 @@ bool isFinalForm(const std::unique_ptr<CondTreeNode> &root)
 
 FinalizationStatus finalizePlus(std::unique_ptr<CondTreeNode> &root)
 {
+    assert(root->isOp('+'));
     const auto N = CondTreeNode::Type::NUM_NODE;
     if (root->left->type == N && root->right->type == N) {
         root = CondTreeNode::make(root->left->value.num+root->left->value.num);
@@ -137,9 +138,11 @@ FinalizationStatus finalizePlus(std::unique_ptr<CondTreeNode> &root)
 
 static FinalizationStatus finalizeMinus(std::unique_ptr<CondTreeNode> &root)
 {
+    assert(root->isOp('-'));
     const auto N = CondTreeNode::Type::NUM_NODE;
     if (root->left->type == N && root->right->type == N) {
         root = CondTreeNode::make(root->left->value.num-root->left->value.num);
+        return FinalizationStatus::SUCCESS;
     } else {
         // don't change anything
         auto n = CondTreeNode::make('+');
@@ -149,16 +152,45 @@ static FinalizationStatus finalizeMinus(std::unique_ptr<CondTreeNode> &root)
         n->right->right = std::move(root->right);
         n->left = std::move(root->left);
         root = std::move(n);
+        return finalizeMultiply(root->right);
     }
-    return FinalizationStatus::SUCCESS;
 }
 
 static FinalizationStatus finalizeMultiply(std::unique_ptr<CondTreeNode> &root)
 {
+    assert(root->isOp('*'));
+    const auto N = CondTreeNode::Type::NUM_NODE;
+    if (root->right->type == N) {
+        if (root->left->type == N) {
+            root = CondTreeNode::make(
+                    root->left->value.num * root->left->value.num
+            );
+            return FinalizationStatus::SUCCESS;
+        } else {
+            std::swap(root->left, root->right);
+        }
+    }
+
+    if (root->right->isOp('+')) {
+        // TODO return
+    }
+
+    if (root->left->isOp('+')) {
+        std::swap(root->left, root->right);
+        return finalizeMultiply(root);
+    }
+
+    if (root->right->isOp('*')) {
+        if (root->left->type != N) {
+            return FinalizationStatus::NON_LINEAR;
+        }
+        // TODO
+    }
 }
 
 static FinalizationStatus finalizeDivide(std::unique_ptr<CondTreeNode> &root)
 {
+    assert(root->isOp('/'));
 }
 
 static FinalizationStatus finalizeTreeImpl(std::unique_ptr<CondTreeNode> &root)
