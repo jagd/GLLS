@@ -100,6 +100,7 @@ BOOST_AUTO_TEST_SUITE(TestValidForm)
                 "1*1 = y3*2 = (1+1)*x4",
                 "1+y3*3+z12 = 3*5*z4",
                 "1+y3*(3+z12) = 5*z4*4",
+                "1/2 = 1-1",
         };
         auto sl = SymbolList();
         sl.insert("y");
@@ -114,6 +115,9 @@ BOOST_AUTO_TEST_SUITE(TestValidForm)
                 BOOST_CHECK(!isFinalForm(x.root->right));
             }
         }
+        BOOST_CHECK(!isFinalForm(CondTreeNode::make('+')));
+        std::unique_ptr<CondTreeNode> p(new CondTreeNode);
+        BOOST_CHECK(!isFinalForm(p));
     }
 
 BOOST_AUTO_TEST_SUITE_END()
