@@ -1,7 +1,14 @@
 #include "condtree.h"
-
 #include <memory>
+#include <utility>
 #include <cassert>
+
+static FinalizationStatus finalizePlus(std::unique_ptr<CondTreeNode> &root);
+static FinalizationStatus finalizeMinus(std::unique_ptr<CondTreeNode> &root);
+static FinalizationStatus finalizeMultiply(std::unique_ptr<CondTreeNode> &root);
+static FinalizationStatus finalizeDivide(std::unique_ptr<CondTreeNode> &root);
+static FinalizationStatus finalizeTreeImpl(std::unique_ptr<CondTreeNode> &root);
+static bool isFinalFormImpl(const std::unique_ptr<CondTreeNode> &root);
 
 CondTreeNode::CondTreeNode() : type(Type::INVALID_NODE)
 {
@@ -119,3 +126,74 @@ bool isFinalForm(const std::unique_ptr<CondTreeNode> &root)
     return isFinalFormImpl(root);
 }
 
+FinalizationStatus finalizePlus(std::unique_ptr<CondTreeNode> &root)
+{
+    const auto N = CondTreeNode::Type::NUM_NODE;
+    if (root->left->type == N && root->right->type == N) {
+        root = CondTreeNode::make(root->left->value.num+root->left->value.num);
+    }
+    return FinalizationStatus::SUCCESS;
+}
+
+static FinalizationStatus finalizeMinus(std::unique_ptr<CondTreeNode> &root)
+{
+    const auto N = CondTreeNode::Type::NUM_NODE;
+    if (root->left->type == N && root->right->type == N) {
+        root = CondTreeNode::make(root->left->value.num-root->left->value.num);
+    } else {
+        // don't change anything
+        auto n = CondTreeNode::make('+');
+        n->right = CondTreeNode::make('*');
+        n->right->left = CondTreeNode::make(-1.0);
+        // now exception safe
+        n->right->right = std::move(root->right);
+        n->left = std::move(root->left);
+        root = std::move(n);
+    }
+    return FinalizationStatus::SUCCESS;
+}
+
+static FinalizationStatus finalizeMultiply(std::unique_ptr<CondTreeNode> &root)
+{
+}
+
+static FinalizationStatus finalizeDivide(std::unique_ptr<CondTreeNode> &root)
+{
+}
+
+static FinalizationStatus finalizeTreeImpl(std::unique_ptr<CondTreeNode> &root)
+{
+    if (root->isTerm()) {
+        return FinalizationStatus::SUCCESS;
+    }
+    const auto sl = finalizeTreeImpl(root->left);
+    if (sl !=  FinalizationStatus::SUCCESS) {
+        return sl;
+    }
+    const auto sr = finalizeTreeImpl(root->right);
+    if (sr !=  FinalizationStatus::SUCCESS) {
+        return sr;
+    }
+    assert(root->type == CondTreeNode::Type::OP_NODE);
+    switch (root->value.op) {
+        case '+':
+            return finalizePlus(root);
+        case '-':
+            return finalizeMinus(root);
+        case '*':
+            return finalizeMultiply(root);
+        case '/':
+            return finalizeDivide(root);
+        default:
+            return FinalizationStatus::INVALID_OPERATOR;
+    }
+//    return FinalizationStatus::UNKNOWN_FAILURE;
+}
+
+FinalizationStatus finalizeTree(std::unique_ptr<CondTreeNode> &root)
+{
+    if (!root->isValid()) {
+        return FinalizationStatus::INVALID_EXPRESSION;
+    }
+    return finalizeTreeImpl(root);
+}

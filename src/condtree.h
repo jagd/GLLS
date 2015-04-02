@@ -2,6 +2,7 @@
 #define _GENERAL_LINEAR_LEAST_SQUARES_CONDTREE_H_
 
 #include <memory>
+#include <utility>
 
 class CondTreeNode
 {
@@ -50,6 +51,15 @@ bool isFinalForm(const std::unique_ptr<CondTreeNode> &);
 inline bool isFinalForm(const CondTree &tree)
 {
     return isFinalForm(tree.root);
+}
+
+enum class FinalizationStatus
+{SUCCESS, UNKNOWN_FAILURE, INVALID_EXPRESSION, INVALID_OPERATOR};
+
+FinalizationStatus finalizeTree(std::unique_ptr<CondTreeNode> &);
+inline FinalizationStatus finalizeTree(CondTree &tree)
+{
+    return finalizeTree(tree->root);
 }
 
 #endif //_GENERAL_LINEAR_LEAST_SQUARES_CONDTREE_H_
