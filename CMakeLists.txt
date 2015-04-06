@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.8)
 if (UNIX OR CYGWIN)
-set(CMAKE_CONFIGURATION_TYPES Coverage Debug Release RelWithDebInfo CACHE TYPE INTERNAL FORCE )
+set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo Coverage CACHE TYPE INTERNAL FORCE )
 else()
 set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo CACHE TYPE INTERNAL FORCE )
 endif()
