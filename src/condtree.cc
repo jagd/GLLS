@@ -156,7 +156,8 @@ static FinalizationStatus finalizeMinus(std::unique_ptr<CondTreeNode> &root)
     }
 }
 
-static FinalizationStatus finalizeMultiply(std::unique_ptr<CondTreeNode> &root)
+/** @return true if the invoker should pass */
+static bool auxFinalizeMultiplyNum(std::unique_ptr<CondTreeNode> &root)
 {
     assert(root->isOp('*'));
     const auto N = CondTreeNode::Type::NUM_NODE;
@@ -165,26 +166,81 @@ static FinalizationStatus finalizeMultiply(std::unique_ptr<CondTreeNode> &root)
             root = CondTreeNode::make(
                     root->left->value.num * root->left->value.num
             );
-            return FinalizationStatus::SUCCESS;
+            return true;
         } else {
             std::swap(root->left, root->right);
         }
     }
+    return false;
+}
 
-    if (root->right->isOp('+')) {
-        // TODO return
-    }
-
-    if (root->left->isOp('+')) {
-        std::swap(root->left, root->right);
-        return finalizeMultiply(root);
-    }
-
-    if (root->right->isOp('*')) {
-        if (root->left->type != N) {
-            return FinalizationStatus::NON_LINEAR;
+static bool auxFinalizeMultiplyPlus(
+        std::unique_ptr<CondTreeNode> &root,
+        FinalizationStatus &s
+)
+{
+    assert(root->isOp('*'));
+    bool pass = false;
+    while (root->right->isOp('+')) {
+        pass = true;
+        // ensure exception safe
+        auto n = CondTreeNode::make('+');
+        n->left = CondTreeNode::make('*');
+        n->left->left = root->left->clone();
+        n->left->right = root->right->left->clone();
+        n->right = CondTreeNode::make('*');
+        // following: nothrow
+        n->right->left = std::move(root->left);
+        n->right->right = std::move(root->right->right);
+        root = std::move(n);
+        const auto nls = finalizeMultiply(root->left);
+        if (nls != FinalizationStatus::SUCCESS) {
+            s =  nls;
+            return true;
         }
-        // TODO
+        const auto nrs = finalizeMultiply(root->right);
+        if (nrs != FinalizationStatus::SUCCESS) {
+            s =  nrs;
+            return true;
+        }
+        if (root->left->isOp('+')) {
+            std::swap(root->left, root->right);
+        }
+    }
+    return pass;
+}
+
+static bool auxFinalizeMultiplyMul(
+        std::unique_ptr<CondTreeNode> &root,
+        FinalizationStatus &s
+)
+{
+    assert(root->isOp('*'));
+    if (root->right->isOp('*')) {
+        // todo
+    }
+    return false;
+}
+
+static FinalizationStatus finalizeMultiply(std::unique_ptr<CondTreeNode> &root) {
+    if (auxFinalizeMultiplyNum(root)) {
+        return FinalizationStatus::SUCCESS;
+    }
+    FinalizationStatus res;
+    if (auxFinalizeMultiplyMul(root,res)) {
+        return res;
+    }
+    if (auxFinalizeMultiplyPlus(root,res)) {
+        return res;
+    }
+    assert(root->left->type == CondTreeNode::Type::ID_NODE);
+    switch (root->left->type) {
+        case CondTreeNode::Type::NUM_NODE:
+            return FinalizationStatus::SUCCESS;
+        case CondTreeNode::Type::ID_NODE:
+            return FinalizationStatus::HIGH_ORDER;
+        default:
+            return FinalizationStatus::UNKNOWN_FAILURE;
     }
 }
 
