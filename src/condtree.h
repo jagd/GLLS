@@ -56,8 +56,9 @@ inline bool isFinalForm(const CondTree &tree)
 
 enum class FinalizationStatus
 {
-    SUCCESS,            UNKNOWN_FAILURE,            INVALID_EXPRESSION,
-    INVALID_OPERATOR, HIGH_ORDER
+    SUCCESS,            UNKNOWN_FAILURE,    INVALID_EXPRESSION,
+    INVALID_OPERATOR,   HIGH_ORDER,         DIVIDE_SYMBOL,
+    DIVIDE_ZERO
 };
 
 FinalizationStatus finalizeTree(std::unique_ptr<CondTreeNode> &);

@@ -265,6 +265,15 @@ static FinalizationStatus finalizeMultiply(std::unique_ptr<CondTreeNode> &root) 
 static FinalizationStatus finalizeDivide(std::unique_ptr<CondTreeNode> &root)
 {
     assert(root->isOp('/'));
+    if (root->right->type != CondTreeNode::Type::NUM_NODE) {
+        return FinalizationStatus::DIVIDE_SYMBOL;
+    }
+    if (root->right->value.num == 0) {
+        return FinalizationStatus::DIVIDE_ZERO;
+    }
+    root->right->value.num = 1.0 / root->right->value.num;
+    root->value.op = '*';
+    return finalizeMultiply(root);
 }
 
 static FinalizationStatus finalizeTreeImpl(std::unique_ptr<CondTreeNode> &root)

@@ -128,6 +128,9 @@ BOOST_AUTO_TEST_SUITE(TestValidForm)
                 "x1 = (1-y2)+z1",
                 "3*(3+(x1*2*(3+6)+5)) - (2+3)*(1-y2)+z1 = 0",
                 "1 + x0 = 3",
+                "z1 = 1/2",
+                "z1 = y3*1/2/4/5/6",
+                "z1 = y3*1/(2+4*5)*7/(3-4)/(5-3*4)/6",
         };
         auto sl = SymbolList();
         sl.insert("y");
