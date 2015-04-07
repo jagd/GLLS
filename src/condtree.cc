@@ -132,7 +132,7 @@ FinalizationStatus finalizePlus(std::unique_ptr<CondTreeNode> &root)
     assert(root->isOp('+'));
     const auto N = CondTreeNode::Type::NUM_NODE;
     if (root->left->type == N && root->right->type == N) {
-        root = CondTreeNode::make(root->left->value.num+root->left->value.num);
+        root = CondTreeNode::make(root->left->value.num+root->right->value.num);
     }
     return FinalizationStatus::SUCCESS;
 }
@@ -142,7 +142,7 @@ static FinalizationStatus finalizeMinus(std::unique_ptr<CondTreeNode> &root)
     assert(root->isOp('-'));
     const auto N = CondTreeNode::Type::NUM_NODE;
     if (root->left->type == N && root->right->type == N) {
-        root = CondTreeNode::make(root->left->value.num-root->left->value.num);
+        root = CondTreeNode::make(root->left->value.num-root->right->value.num);
         return FinalizationStatus::SUCCESS;
     } else {
         // don't change anything
@@ -165,7 +165,7 @@ static bool auxFinalizeMultiplyNum(std::unique_ptr<CondTreeNode> &root)
     if (root->right->type == N) {
         if (root->left->type == N) {
             root = CondTreeNode::make(
-                    root->left->value.num * root->left->value.num
+                    root->left->value.num * root->right->value.num
             );
             return true;
         } else {
@@ -182,7 +182,11 @@ static bool auxFinalizeMultiplyPlus(
 {
     assert(root->isOp('*'));
     bool pass = false;
-    while (root->right->isOp('+')) {
+    s = FinalizationStatus::SUCCESS;
+    if (root->left->isOp('+')) {
+        std::swap(root->left, root->right);
+    }
+    if (root->right->isOp('+')) {
         pass = true;
         // ensure exception safe
         auto n = CondTreeNode::make('+');
@@ -204,9 +208,6 @@ static bool auxFinalizeMultiplyPlus(
             s =  nrs;
             return true;
         }
-        if (root->left->isOp('+')) {
-            std::swap(root->left, root->right);
-        }
     }
     return pass;
 }
@@ -217,14 +218,21 @@ static bool auxFinalizeMultiplyMul(
 )
 {
     assert(root->isOp('*'));
+    s = FinalizationStatus::SUCCESS;
     if (root->right->isOp('*')) {
         std::swap(root->left, root->right->right);
         std::swap(root->left, root->right);
-        s = finalizeMultiply(root->left);
         if (s != FinalizationStatus::SUCCESS) {
             return true;
         }
         s = finalizeMultiply(root);
+        if (s != FinalizationStatus::SUCCESS) {
+            return true;
+        }
+        return true;
+    }
+    if (root->left->isOp('*')) {
+        s = finalizeMultiply(root->left);
         if (s != FinalizationStatus::SUCCESS) {
             return true;
         }
@@ -237,10 +245,10 @@ static FinalizationStatus finalizeMultiply(std::unique_ptr<CondTreeNode> &root) 
         return FinalizationStatus::SUCCESS;
     }
     FinalizationStatus res;
-    if (auxFinalizeMultiplyMul(root,res)) {
+    if (auxFinalizeMultiplyPlus(root,res)) {
         return res;
     }
-    if (auxFinalizeMultiplyPlus(root,res)) {
+    if (auxFinalizeMultiplyMul(root,res)) {
         return res;
     }
     assert(root->left->type == CondTreeNode::Type::NUM_NODE);
@@ -340,7 +348,7 @@ std::ostream &
 operator<< (std::ostream &s, const std::unique_ptr<CondTreeNode> &root)
 {
     s << "\\begin{tikzpicture}"
-         "[->,>=stealth ', level/.style={sibling distance = 5cm/#1,"
+         "[->,level/.style={sibling distance = 5cm/#1,"
          "level distance = 1.5cm}, scale=0.6,transform shape]"
          "\n\\";
     dumpTree(s, root);

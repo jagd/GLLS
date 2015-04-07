@@ -126,6 +126,7 @@ BOOST_AUTO_TEST_SUITE(TestValidForm)
                 "1+x1 = 1+y2",
                 "1+x1 = 1-y2",
                 "x1 = (1-y2)+z1",
+                "3*(3+(x1*2*(3+6)+5)) - (2+3)*(1-y2)+z1 = 0",
                 "1 + x0 = 3",
         };
         auto sl = SymbolList();
@@ -137,7 +138,6 @@ BOOST_AUTO_TEST_SUITE(TestValidForm)
                 BOOST_TEST_CHECKPOINT("parsing " << s);
                 BOOST_CHECK(!isFinalForm(x.root));
                 BOOST_TEST_PASSPOINT();
-                finalizeTree(x);
                 BOOST_CHECK(finalizeTree(x) == FinalizationStatus::SUCCESS);
                 BOOST_TEST_PASSPOINT();
                 BOOST_CHECK(isFinalForm(x.root));
