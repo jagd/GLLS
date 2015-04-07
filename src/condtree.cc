@@ -1,5 +1,6 @@
 #include "condtree.h"
 #include <memory>
+#include <ostream>
 #include <utility>
 #include <cassert>
 
@@ -293,4 +294,56 @@ FinalizationStatus finalizeTree(std::unique_ptr<CondTreeNode> &root)
         return FinalizationStatus::INVALID_EXPRESSION;
     }
     return finalizeTreeImpl(root);
+}
+
+static void
+nodeLatex(std::ostream &s, const std::unique_ptr<CondTreeNode> &root)
+{
+    if (!root) {
+        return;
+    }
+    switch (root->type)
+    {
+        case CondTreeNode::Type::ID_NODE:
+            s << "$S_{" << root->value.id << "}$";
+            break;
+        case CondTreeNode::Type::OP_NODE:
+            s << '$' << root->value.op << '$';
+            break;
+        case CondTreeNode::Type::NUM_NODE:
+            s << '$' << root->value.num << '$';
+            break;
+        default:
+            break;
+    }
+}
+
+static void
+dumpTree(std::ostream &s, const std::unique_ptr<CondTreeNode> &root)
+{
+    s << "node {";
+    nodeLatex(s, root);
+    s << "}\n";
+    if (root->left) {
+        s << "child {";
+        dumpTree(s, root->left);
+        s << "}\n";
+    }
+    if (root->right) {
+        s << "child {";
+        dumpTree(s, root->right);
+        s << "}\n";
+    }
+}
+
+std::ostream &
+operator<< (std::ostream &s, const std::unique_ptr<CondTreeNode> &root)
+{
+    s << "\\begin{tikzpicture}"
+         "[->,>=stealth ', level/.style={sibling distance = 5cm/#1,"
+         "level distance = 1.5cm}, scale=0.6,transform shape]"
+         "\n\\";
+    dumpTree(s, root);
+    s << ";\n\\end{tikzpicture}\n";
+    return s;
 }
