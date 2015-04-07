@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <utility>
+#include <iosfwd>
 
 class CondTreeNode
 {
@@ -64,5 +65,8 @@ inline FinalizationStatus finalizeTree(CondTree &tree)
 {
     return finalizeTree(tree.root);
 }
+
+std::ostream &
+operator<< (std::ostream &s, const std::unique_ptr<CondTreeNode> &root);
 
 #endif //_GENERAL_LINEAR_LEAST_SQUARES_CONDTREE_H_
