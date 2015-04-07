@@ -121,11 +121,12 @@ BOOST_AUTO_TEST_SUITE(TestValidForm)
 
     BOOST_AUTO_TEST_CASE(TestFinalizable) {
         const char *buf[] = {
-//                "1 = 1",
-//                "1+x1 = 1+y2",
-//                "1+x1 = 1-y2",
-//                "1+x1 = (1-y2)+z1",
-        "1 + x0 = 3"
+                "1-y0 = 0",
+                "1 = 1",
+                "1+x1 = 1+y2",
+                "1+x1 = 1-y2",
+                "x1 = (1-y2)+z1",
+                "1 + x0 = 3",
         };
         auto sl = SymbolList();
         sl.insert("y");
@@ -136,6 +137,7 @@ BOOST_AUTO_TEST_SUITE(TestValidForm)
                 BOOST_TEST_CHECKPOINT("parsing " << s);
                 BOOST_CHECK(!isFinalForm(x.root));
                 BOOST_TEST_PASSPOINT();
+                finalizeTree(x);
                 BOOST_CHECK(finalizeTree(x) == FinalizationStatus::SUCCESS);
                 BOOST_TEST_PASSPOINT();
                 BOOST_CHECK(isFinalForm(x.root));

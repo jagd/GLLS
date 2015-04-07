@@ -217,7 +217,16 @@ static bool auxFinalizeMultiplyMul(
 {
     assert(root->isOp('*'));
     if (root->right->isOp('*')) {
-        // todo
+        std::swap(root->left, root->right->right);
+        std::swap(root->left, root->right);
+        s = finalizeMultiply(root->left);
+        if (s != FinalizationStatus::SUCCESS) {
+            return true;
+        }
+        s = finalizeMultiply(root);
+        if (s != FinalizationStatus::SUCCESS) {
+            return true;
+        }
     }
     return false;
 }
@@ -233,7 +242,7 @@ static FinalizationStatus finalizeMultiply(std::unique_ptr<CondTreeNode> &root) 
     if (auxFinalizeMultiplyPlus(root,res)) {
         return res;
     }
-    assert(root->left->type == CondTreeNode::Type::ID_NODE);
+    assert(root->left->type == CondTreeNode::Type::NUM_NODE);
     switch (root->left->type) {
         case CondTreeNode::Type::NUM_NODE:
             return FinalizationStatus::SUCCESS;
