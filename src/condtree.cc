@@ -1,8 +1,11 @@
 #include "condtree.h"
+#include "symbollist.h"
+#include "condparser.h"
 #include <memory>
 #include <ostream>
 #include <utility>
 #include <cassert>
+#include <map>
 
 static FinalizationStatus finalizePlus(std::unique_ptr<CondTreeNode> &root);
 static FinalizationStatus finalizeMinus(std::unique_ptr<CondTreeNode> &root);
@@ -364,3 +367,59 @@ operator<< (std::ostream &s, const std::unique_ptr<CondTreeNode> &root)
     s << ";\n\\end{tikzpicture}\n";
     return s;
 }
+
+inline void insertPolynomialTerm(
+        std::map<int, double> &m,
+        double factor,
+        int id
+)
+{
+    m[id] += factor;
+}
+
+static void toListImpl(
+    std::map<int, double> &m,
+    const std::unique_ptr<CondTreeNode> &root
+)
+{
+    switch (root->type) {
+        case CondTreeNode::Type::ID_NODE:
+            insertPolynomialTerm(m, 1.0, root->value.id);
+            break;
+        case CondTreeNode::Type::NUM_NODE:
+            insertPolynomialTerm(m, root->value.num, CondDict::ID_CONST);
+            break;
+        case CondTreeNode::Type::OP_NODE:
+            switch (root->value.op) {
+                case '+':
+                    toListImpl(m, root->left);
+                    toListImpl(m, root->right);
+                    break;
+                case '*':
+                    insertPolynomialTerm(
+                            m,
+                            root->left->value.num,
+                            root->right->value.id
+                    );
+                    break;
+                default:
+                    assert(false);
+                    break;
+            }
+            break;
+        default:
+            assert(false);
+            break;
+    }
+}
+
+std::vector<std::pair<int, double> >
+toList(const std::unique_ptr<CondTreeNode> &root)
+{
+    assert(isFinalForm(root));
+    std::map<int, double> m;
+    toListImpl(m, root);
+    std::vector<std::pair<int, double> > res;
+    std::copy(m.cbegin(), m.cend(), std::back_inserter(res));
+}
+

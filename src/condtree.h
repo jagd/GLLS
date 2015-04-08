@@ -4,6 +4,7 @@
 #include <memory>
 #include <utility>
 #include <iosfwd>
+#include <vector>
 
 class CondTreeNode
 {
@@ -69,5 +70,20 @@ inline FinalizationStatus finalizeTree(CondTree &tree)
 
 std::ostream &
 operator<< (std::ostream &s, const std::unique_ptr<CondTreeNode> &root);
+
+/**
+    @param root a tree root in final form
+*/
+std::vector<std::pair<int, double> >
+toList(const std::unique_ptr<CondTreeNode> &root);
+
+/**
+    @param tree a tree in final form
+*/
+inline std::vector<std::pair<int, double> >
+toList(const CondTree &tree)
+{
+    return toList(tree.root);
+}
 
 #endif //_GENERAL_LINEAR_LEAST_SQUARES_CONDTREE_H_
