@@ -198,9 +198,10 @@ BOOST_AUTO_TEST_SUITE(TestValidForm)
         BOOST_CHECK(isEqual(toList(xs[0]), toList(xs[1])));
     }
 
-    BOOST_AUTO_TEST_CASE(TestEqual_5) {
+    BOOST_AUTO_TEST_CASE(TestEqual_MixedTest) {
         std::istringstream ss(
-            "z0 = (1+2)*(6-3*9)/10/(-1+2-3+5) + (x5-5)*(1+1) = 2*x5 - 2" ".1-10"
+            "z0 = (1+2)*(6-3*9)/10/(-1+2-3+5) + ((x5+1)*2-5)*(1+1)"
+            "   = 3*x5 + (1+x5)*1 -1- 2.1-6"
         );
         auto sl = SymbolList();
         sl.insert("y");
