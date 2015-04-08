@@ -149,14 +149,14 @@ std::vector<CondTree> CondParser::parseCondMiddle()
 std::unique_ptr<CondTreeNode> CondParser::parseExpr()
 {
     std::unique_ptr<CondTreeNode> t = parseTerm();
-    if ( forward_ == CondLexer::Token::TK_OP
+    while ( forward_ == CondLexer::Token::TK_OP
       && (lexer_.symbol() == '+' || lexer_.symbol() == '-') )
     {
         auto r = CondTreeNode::make(static_cast<char>(lexer_.symbol()));
         forward_ = lexer_.token();
+        r->right = parseTerm();
         r->left = std::move(t);
-        r->right = parseExpr();
-        return r;
+        t = std::move(r);
     }
     return t;
 }
@@ -194,14 +194,14 @@ std::vector<CondTree> CondParser::parse()
 std::unique_ptr<CondTreeNode> CondParser::parseTerm()
 {
     auto a = parseAtom();
-    if (forward_ == CondLexer::Token::TK_OP
+    while (forward_ == CondLexer::Token::TK_OP
         && (lexer_.symbol() == '*' || lexer_.symbol() == '/')
     ) {
         auto r = CondTreeNode::make(static_cast<char>(lexer_.symbol()));
         forward_ = lexer_.token();
+        r->right = parseAtom();
         r->left = std::move(a);
-        r->right = parseTerm();
-        return r;
+        a = std::move(r);
     }
     return a;
 }

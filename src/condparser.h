@@ -15,14 +15,14 @@ Grammar:
 
     expr        := term expr_tail
 
-    expr_tail   := '+' expr
-                 | '-' expr
+    expr_tail   := '+' term expr_tail
+                 | '-' term expr_tail
                  | epsilon
 
     term        := atom term_tail
 
-    term_tail   := '*' term
-                 | '/' term
+    term_tail   := '*' atom term_tail
+                 | '/' atom term_tail
                  | epsilon
 
     atom        := '-' atom_tail

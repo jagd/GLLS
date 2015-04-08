@@ -161,7 +161,46 @@ BOOST_AUTO_TEST_SUITE(TestValidForm)
 
     BOOST_AUTO_TEST_CASE(TestEqual_2) {
         std::istringstream ss(
-                "z0 = (1+2)*(6-3*9)/10 + (x5+5)*(1+1) = 2*x5 - 6.3+10"
+                "z0 = 1-2 = -1"
+        );
+        auto sl = SymbolList();
+        sl.insert("y");
+        sl.insert("z");
+        auto xs = CondParser(ss, sl, "x").parse();
+        BOOST_CHECK(finalizeTree(xs[0]) == FinalizationStatus::SUCCESS);
+        BOOST_CHECK(finalizeTree(xs[1]) == FinalizationStatus::SUCCESS);
+        BOOST_CHECK(isEqual(toList(xs[0]), toList(xs[1])));
+    }
+
+    BOOST_AUTO_TEST_CASE(TestEqual_3) {
+        std::istringstream ss(
+                "z0 = 1-2+3-4 = -2"
+        );
+        auto sl = SymbolList();
+        sl.insert("y");
+        sl.insert("z");
+        auto xs = CondParser(ss, sl, "x").parse();
+        BOOST_CHECK(finalizeTree(xs[0]) == FinalizationStatus::SUCCESS);
+        BOOST_CHECK(finalizeTree(xs[1]) == FinalizationStatus::SUCCESS);
+        BOOST_CHECK(isEqual(toList(xs[0]), toList(xs[1])));
+    }
+
+    BOOST_AUTO_TEST_CASE(TestEqual_4) {
+        std::istringstream ss(
+                "z0 = 24/2/3/2 = 2+2-3+1"
+        );
+        auto sl = SymbolList();
+        sl.insert("y");
+        sl.insert("z");
+        auto xs = CondParser(ss, sl, "x").parse();
+        BOOST_CHECK(finalizeTree(xs[0]) == FinalizationStatus::SUCCESS);
+        BOOST_CHECK(finalizeTree(xs[1]) == FinalizationStatus::SUCCESS);
+        BOOST_CHECK(isEqual(toList(xs[0]), toList(xs[1])));
+    }
+
+    BOOST_AUTO_TEST_CASE(TestEqual_5) {
+        std::istringstream ss(
+            "z0 = (1+2)*(6-3*9)/10/(-1+2-3+5) + (x5-5)*(1+1) = 2*x5 - 2" ".1-10"
         );
         auto sl = SymbolList();
         sl.insert("y");
