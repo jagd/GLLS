@@ -146,7 +146,6 @@ static FinalizationStatus finalizeMinus(std::unique_ptr<CondTreeNode> &root)
 {
     assert(root->isOp('-'));
     const auto N = CondTreeNode::Type::NUM_NODE;
-    const auto S = CondTreeNode::Type::ID_NODE;
     if (root->left->type == N && root->right->type == N) {
         root = CondTreeNode::make(root->left->value.num-root->right->value.num);
         return FinalizationStatus::SUCCESS;
