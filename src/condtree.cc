@@ -1,6 +1,8 @@
 #include "condtree.h"
 #include "symbollist.h"
 #include "condparser.h"
+
+#include <algorithm>
 #include <memory>
 #include <ostream>
 #include <utility>
@@ -419,7 +421,34 @@ toList(const std::unique_ptr<CondTreeNode> &root)
     assert(isFinalForm(root));
     std::map<int, double> m;
     toListImpl(m, root);
-    std::vector<std::pair<int, double> > res;
-    std::copy(m.cbegin(), m.cend(), std::back_inserter(res));
+    std::vector<std::pair<int, double> > res(m.size());
+    std::copy(m.cbegin(), m.cend(), res.begin());
+    return res;
 }
 
+bool isEqual(
+        const std::vector<std::pair<int, double> > v1,
+        const std::vector<std::pair<int, double> > v2
+)
+{
+    if (v1.size() != v2.size()) {
+        return false;
+    }
+    // There is a zip_iterator in boost, but not stl,
+    // hence std::all_of() can not be used.
+    for ( auto a = v1.cbegin(), b = v2.cbegin();
+            a != v1.cend(); ++a, ++b)
+    {
+        if (a->first != b->first) {
+            return false;
+        }
+        if (a->second != 0) {
+          if (std::abs((a->second-b->second)/a->second) > 1e-9) {
+              return false;
+          }
+        } else if (b->second) {
+            return false;
+        }
+    }
+    return true;
+}

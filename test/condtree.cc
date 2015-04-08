@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_SUITE(TestValidForm)
                 "1*1 = y3*2 = (1+1)*x4",
                 "1+y3*3+z12 = 3*5*z4",
                 "1+y3*(3+z12) = 5*z4*4",
-                "1/2 = 1-1",
+                "1/2 = 1-1+z0",
         };
         auto sl = SymbolList();
         sl.insert("y");
@@ -146,6 +146,30 @@ BOOST_AUTO_TEST_SUITE(TestValidForm)
                 BOOST_CHECK(isFinalForm(x.root));
             }
         }
+    }
+
+    BOOST_AUTO_TEST_CASE(TestEqual_1) {
+        std::istringstream ss("z0 = 1+2 = 3");
+        auto sl = SymbolList();
+        sl.insert("y");
+        sl.insert("z");
+        auto xs = CondParser(ss, sl, "x").parse();
+        BOOST_CHECK(finalizeTree(xs[0]) == FinalizationStatus::SUCCESS);
+        BOOST_CHECK(finalizeTree(xs[1]) == FinalizationStatus::SUCCESS);
+        BOOST_CHECK(isEqual(toList(xs[0]), toList(xs[1])));
+    }
+
+    BOOST_AUTO_TEST_CASE(TestEqual_2) {
+        std::istringstream ss(
+                "z0 = (1+2)*(6-3*9)/10 + (x5+5)*(1+1) = 2*x5 - 6.3+10"
+        );
+        auto sl = SymbolList();
+        sl.insert("y");
+        sl.insert("z");
+        auto xs = CondParser(ss, sl, "x").parse();
+        BOOST_CHECK(finalizeTree(xs[0]) == FinalizationStatus::SUCCESS);
+        BOOST_CHECK(finalizeTree(xs[1]) == FinalizationStatus::SUCCESS);
+        BOOST_CHECK(isEqual(toList(xs[0]), toList(xs[1])));
     }
 
 BOOST_AUTO_TEST_SUITE_END()

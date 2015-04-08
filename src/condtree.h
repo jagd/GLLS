@@ -86,4 +86,9 @@ toList(const CondTree &tree)
     return toList(tree.root);
 }
 
+bool isEqual(
+        const std::vector<std::pair<int, double> >,
+        const std::vector<std::pair<int,  double> >
+);
+
 #endif //_GENERAL_LINEAR_LEAST_SQUARES_CONDTREE_H_
