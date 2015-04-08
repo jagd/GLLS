@@ -28,15 +28,15 @@ BOOST_AUTO_TEST_SUITE(TestCondDict)
         const auto dict = CondDict(sl, "x");
         BOOST_CHECK_EQUAL(
                 dict.symToID("", 0),
-                static_cast<int>(dict.ID_INV)
+                static_cast<int>(dict.ID_INVALID)
         );
         BOOST_CHECK_EQUAL(
                 dict.symToID("x", 0),
-                static_cast<int>(dict.ID_VAR_BASE)
+                static_cast<int>(dict.ID_X_VAR_NEG_BASE)
         );
         BOOST_CHECK_EQUAL(
                 dict.symToID("x", 100),
-                static_cast<int>(dict.ID_VAR_BASE-100)
+                static_cast<int>(dict.ID_X_VAR_NEG_BASE -100)
         );
     }
 
@@ -227,12 +227,12 @@ BOOST_AUTO_TEST_SUITE(TestCondLexer)
         BOOST_REQUIRE(lexer.token() == CondLexer::Token::TK_ID);
         BOOST_CHECK_EQUAL(
                 lexer.symbol(),
-                static_cast<int>(CondDict::ID_VAR_BASE)
+                static_cast<int>(CondDict::ID_X_VAR_NEG_BASE)
         );
         BOOST_REQUIRE(lexer.token() == CondLexer::Token::TK_ID);
         BOOST_CHECK_EQUAL(
                 lexer.symbol(),
-                static_cast<int>(CondDict::ID_VAR_BASE-100)
+                static_cast<int>(CondDict::ID_X_VAR_NEG_BASE -100)
         );
     }
 

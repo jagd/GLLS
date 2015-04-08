@@ -8,9 +8,9 @@
 #include <cctype>
 
 //constexpr int CondDict::ID_CONST;
-//constexpr int CondDict::ID_INV;
-//constexpr int CondDict::ID_VAR_BASE;
-//constexpr int CondDict::ID_SYM_BASE;
+//constexpr int CondDict::ID_INVALID;
+//constexpr int CondDict::ID_X_VAR_NEG_BASE;
+//constexpr int CondDict::ID_Y_VAR_POS_BASE;
 
 CondTree build_equation(const CondTree &a, const CondTree &b)
 {
@@ -20,23 +20,23 @@ CondTree build_equation(const CondTree &a, const CondTree &b)
     return CondTree(std::move(root));
 }
 
-CondDict::CondDict(const SymbolList &sl, const std::string &varName)
-    : varName_(varName), symList_(sl)
+CondDict::CondDict(const SymbolList &sl, const std::string &xVarName)
+    : xVarName_(xVarName), symList_(sl)
 {
-    // assert(!varName_.empty());
-    checkVarName();
+    // assert(!xVarName_.empty());
+    checkXVarName();
 }
 
-CondDict::CondDict(SymbolList &&sl, const std::string &varName)
-    : varName_(varName), symList_(sl)
+CondDict::CondDict(SymbolList &&sl, const std::string &xVarName)
+    : xVarName_(xVarName), symList_(sl)
 {
-    // assert(!varName_.empty());
-    checkVarName();
+    // assert(!xVarName_.empty());
+    checkXVarName();
 }
 
-void CondDict::checkVarName() const
+void CondDict::checkXVarName() const
 {
-    if (varName_.empty()) {
+    if (xVarName_.empty()) {
         throw std::logic_error("CondLexer: variable name can not be empty");
     }
 }
@@ -44,14 +44,14 @@ void CondDict::checkVarName() const
 int CondDict::symToID(const std::string &name, int index) const
 {
     assert(index >= 0);
-    if (name == varName_) {
-        return ID_VAR_BASE - index;
+    if (name == xVarName_) {
+        return ID_X_VAR_NEG_BASE - index;
     }
     const int offset = symList_.query(name);
     if (offset >= 0) {
         return static_cast<int>(symList_.size() * index + offset);
     }
-    return ID_INV;
+    return ID_INVALID;
 }
 
 CondLexer::CondLexer(std::istream &s, const CondDict &d)
@@ -118,7 +118,7 @@ CondLexer::Token CondLexer::peekAlpha()
     }
     msg_.clear();
     symbol_ = dict_.symToID(name, num);
-    if (symbol_ == dict_.ID_INV)  {
+    if (symbol_ == dict_.ID_INVALID)  {
         msg_ += ", invalid symbol ";
         msg_ += name;
         msg_ += numstr;
@@ -130,8 +130,8 @@ CondLexer::Token CondLexer::peekAlpha()
 CondParser::CondParser(
         std::istream & s,
         const SymbolList &l,
-        const std::string &varName
-) : lexer_(s, CondDict(l, varName))
+        const std::string &xVarName
+) : lexer_(s, CondDict(l, xVarName))
 {
     forward_ = lexer_.token();
 }

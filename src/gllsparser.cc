@@ -9,21 +9,21 @@
 #include <cctype>
 
 GllsParser::GllsParser(std::istream &stream_)
-        : stream_(stream_), currentLine_(1), unknownNumber_(0)
+        : stream_(stream_), currentLine_(1), xVarSize_(0)
 {
 }
 
 std::vector<double> GllsParser::run()
 {
-    readUnknownName();
+    readXVarName();
     sym_.clear();
-    readSymbols();
+    readYVarNames();
     coef_.clear();
     readCoefWithCond();
     return std::vector<double>();
 }
 
-void GllsParser::readUnknownName()
+void GllsParser::readXVarName()
 {
     static const std::string fail_msg("failed to read name of the unknown");
     const auto l = nextLine(stream_);
@@ -69,7 +69,7 @@ void GllsParser::checkGood(
     }
 }
 
-void GllsParser::readSymbols()
+void GllsParser::readYVarNames()
 {
     sym_.clear();
     static const std::string fail_msg("failed to read name of symbols");
@@ -111,7 +111,7 @@ void GllsParser::readCoefWithCond()
         }
         attachCoef(s);
     }
-    if ( coef_.size() % (unknownNumber_*sym_.size()) ) {
+    if ( coef_.size() % (xVarSize_ *sym_.size()) ) {
         throw ParserError(
                 currentLine_-1,
                 "rows of coefficients are unaligned",
@@ -131,11 +131,11 @@ void GllsParser::readCoefWithCond()
 void GllsParser::attachCoef(const std::string &s)
 {
     if (coef_.size() == 0) {
-        estimateUnknownNumber(s);
+        guessXVarSize(s);
         return;
     }
     std::istringstream ss(s);
-    for (int i = 0; i < unknownNumber_; ++i) {
+    for (int i = 0; i < xVarSize_; ++i) {
         double v;
         if (!(ss >> v)) {
             throw ParserError(
@@ -158,7 +158,7 @@ void GllsParser::attachCoef(const std::string &s)
     }
 }
 
-void GllsParser::estimateUnknownNumber(const std::string &s)
+void GllsParser::guessXVarSize(const std::string &s)
 {
     std::istringstream ss(s);
     std::string t;
@@ -174,8 +174,8 @@ void GllsParser::estimateUnknownNumber(const std::string &s)
         }
         coef_.push_back(v);
     }
-    unknownNumber_ = static_cast<int>(coef_.size());
-    assert(unknownNumber_ != 0);
+    xVarSize_ = static_cast<int>(coef_.size());
+    assert(xVarSize_ != 0);
 }
 
 void GllsParser::attachCond(const std::string &s)
