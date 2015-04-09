@@ -13,10 +13,13 @@
 class GllsParser
 {
 public:
-    GllsParser(std::istream &stream_);
+    GllsParser(std::istream &stream_, bool homogeneous = true);
     std::vector<double> run();
-    const std::string &unknownName() const { return unknownName_; }
+    const std::string &xVarName() const { return xVarName_; }
     const SymbolList &symbols() const { return sym_; }
+    int xVarSize() const { return xVarSize_; }
+    const std::vector<double> &coef() const { return coef_; }
+
 private:
     GllsParser(const GllsParser &) = delete;
     GllsParser &operator=(const GllsParser &) = delete;
@@ -34,9 +37,10 @@ private:
     void attachCond(const std::string &s);
     void guessXVarSize(const std::string &s);
     std::istream &stream_;
+    bool isHomogeneous_;
     int currentLine_;
     int xVarSize_;
-    std::string unknownName_;
+    std::string xVarName_;
     SymbolList sym_;
     std::vector<double> coef_;
 };

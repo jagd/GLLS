@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_SUITE()
     }
 
     BOOST_AUTO_TEST_CASE(ReadMatrix_6) {
-        std::istringstream ss("x\ny\n1 2 3 4 \n 4 5 6 7 8\n x=1");
+        std::istringstream ss("x\ny\n1 2 3 4 \n 4 5 6 7 8\n x0=1");
         GllsParser gp(ss);
         BOOST_CHECK_EXCEPTION(gp.run(), ParserError,
                 [](const ParserError &e) {
@@ -172,6 +172,14 @@ BOOST_AUTO_TEST_SUITE()
                     return e.type() == ParserError::Type::UNEXPECTED_CHAR;
                 }
         );
+    }
+
+    BOOST_AUTO_TEST_CASE(TestXVarSize) {
+        std::istringstream ss("x\ny\n1 2 3 4 \n 4 5 6 8\n x0=1");
+        GllsParser gp(ss, true);
+        BOOST_REQUIRE_NO_THROW(gp.run());
+        BOOST_CHECK_EQUAL(gp.xVarName(), "x");
+        BOOST_CHECK_EQUAL(gp.xVarSize(), 4);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

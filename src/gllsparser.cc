@@ -1,5 +1,7 @@
 #include "gllsparser.h"
+#include "condtree.h"
 #include "parsercommon.h"
+#include "condparser.h"
 
 #include <vector>
 #include <sstream>
@@ -8,8 +10,8 @@
 #include <cassert>
 #include <cctype>
 
-GllsParser::GllsParser(std::istream &stream_)
-        : stream_(stream_), currentLine_(1), xVarSize_(0)
+GllsParser::GllsParser(std::istream &stream_, bool homo)
+        : stream_(stream_), isHomogeneous_(homo), currentLine_(1), xVarSize_(0)
 {
 }
 
@@ -30,18 +32,19 @@ void GllsParser::readXVarName()
     checkGood(l, fail_msg + ": unexpected file end");
     currentLine_ += l.first;
     std::istringstream ss(std::move(l.second));
-    if (!(ss >> unknownName_)) {
+    if (!(ss >> xVarName_)) {
         throw ParserError(
                 currentLine_-1, fail_msg + ": expect a name",
                 ParserError::Type::EXPECT_CHAR
         );
     }
-    if ( std::any_of(unknownName_.cbegin(), unknownName_.cend(),
+    if ( std::any_of(
+            xVarName_.cbegin(), xVarName_.cend(),
             std::not1(std::ptr_fun<int,int>(std::isalpha))) )
     {
         throw ParserError(
                 currentLine_-1,
-                fail_msg + ": invalid name " + unknownName_,
+                fail_msg + ": invalid name " + xVarName_,
                 ParserError::Type::INVALID_TOKEN
         );
 
@@ -100,24 +103,26 @@ void GllsParser::readYVarNames()
 
 void GllsParser::readCoefWithCond()
 {
+    std::string firstCond;
     while (true) {
         const auto p = nextLine(stream_);
         checkGood(p, "unexpected file end");
         currentLine_ += p.first;
         const std::string &s = p.second;
         if (s.find('=') != s.npos) {
-            attachCond(s);
+            firstCond = s;
             break;
         }
         attachCoef(s);
     }
-    if ( coef_.size() % (xVarSize_ *sym_.size()) ) {
+    if ( coef_.size() % ((xVarSize_+1) *sym_.size()) ) {
         throw ParserError(
                 currentLine_-1,
                 "rows of coefficients are unaligned",
                 ParserError::Type::EXPECT_DIGIT
         );
     }
+    attachCond(firstCond);
     while (true) {
         const auto p = nextLine(stream_);
         if (p.first > 0) {
@@ -145,6 +150,9 @@ void GllsParser::attachCoef(const std::string &s)
             );
         }
         coef_.push_back(v);
+    }
+    if (isHomogeneous_) {
+        coef_.push_back(0.0);
     }
     ss >> std::ws;
     if (!ss.eof()) {
@@ -174,10 +182,21 @@ void GllsParser::guessXVarSize(const std::string &s)
         }
         coef_.push_back(v);
     }
-    xVarSize_ = static_cast<int>(coef_.size());
-    assert(xVarSize_ != 0);
+    if (isHomogeneous_) {
+        coef_.push_back(0.0);
+    }
+    xVarSize_ = static_cast<int>(coef_.size())-1;
+    assert(xVarSize_ > 0);
 }
 
 void GllsParser::attachCond(const std::string &s)
 {
+    std::istringstream ss(s);
+    auto cp = CondParser(ss, sym_, xVarName_);
+    std::vector<CondTree> cs;
+    try {
+        cs = cp.parse();
+    } catch (ParserError &e) {
+        throw ParserError(e.line()+currentLine_-1, e.msg(), e.type());
+    }
 }

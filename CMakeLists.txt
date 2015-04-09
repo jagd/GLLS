@@ -64,6 +64,10 @@ add_executable(test_gllsparser
     src/symbollist.h
     src/parsercommon.cc
     src/parsercommon.h
+    src/condtree.cc
+    src/condtree.h
+    src/condparser.cc
+    src/condparser.h
     )
 target_link_libraries(test_gllsparser ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
