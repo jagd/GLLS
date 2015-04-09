@@ -18,6 +18,7 @@ public:
     const std::string &xVarName() const { return xVarName_; }
     const SymbolList &symbols() const { return sym_; }
     int xVarSize() const { return xVarSize_; }
+    int yVarSize() const { return yVarSize_; }
     const std::vector<double> &coef() const { return coef_; }
 
 private:
@@ -37,9 +38,10 @@ private:
     void attachCond(const std::string &s);
     void guessXVarSize(const std::string &s);
     std::istream &stream_;
-    bool isHomogeneous_;
+    const bool isHomogeneous_;
     int currentLine_;
     int xVarSize_;
+    int yVarSize_;
     std::string xVarName_;
     SymbolList sym_;
     std::vector<double> coef_;

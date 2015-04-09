@@ -174,12 +174,22 @@ BOOST_AUTO_TEST_SUITE()
         );
     }
 
-    BOOST_AUTO_TEST_CASE(TestXVarSize) {
+    BOOST_AUTO_TEST_CASE(TestXYVarSize_1) {
         std::istringstream ss("x\ny\n1 2 3 4 \n 4 5 6 8\n x0=1");
         GllsParser gp(ss, true);
         BOOST_REQUIRE_NO_THROW(gp.run());
         BOOST_CHECK_EQUAL(gp.xVarName(), "x");
         BOOST_CHECK_EQUAL(gp.xVarSize(), 4);
+        BOOST_CHECK_EQUAL(gp.yVarSize(), 2);
+    }
+
+    BOOST_AUTO_TEST_CASE(TestXYVarSize_2) {
+        std::istringstream ss("x\ny\n1 2 3 4 \n 4 5 6 8\n x0=1");
+        GllsParser gp(ss, false);
+        BOOST_REQUIRE_NO_THROW(gp.run());
+        BOOST_CHECK_EQUAL(gp.xVarName(), "x");
+        BOOST_CHECK_EQUAL(gp.xVarSize(), 3);
+        BOOST_CHECK_EQUAL(gp.yVarSize(), 2);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

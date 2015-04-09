@@ -115,6 +115,7 @@ void GllsParser::readCoefWithCond()
         }
         attachCoef(s);
     }
+    yVarSize_ = coef_.size() / (xVarSize_+1);
     if ( coef_.size() % ((xVarSize_+1) *sym_.size()) ) {
         throw ParserError(
                 currentLine_-1,
@@ -140,7 +141,8 @@ void GllsParser::attachCoef(const std::string &s)
         return;
     }
     std::istringstream ss(s);
-    for (int i = 0; i < xVarSize_; ++i) {
+    const int len = isHomogeneous_ ? xVarSize_ : (xVarSize_+1);
+    for (int i = 0; i < len; ++i) {
         double v;
         if (!(ss >> v)) {
             throw ParserError(
