@@ -261,6 +261,16 @@ void GllsParser::attachCond(const std::string &s)
         return;
     }
     if (hasY) {
+        const auto invalidY = auxHasSymbol(ls,
+                std::bind2nd(std::greater_equal<int>(), yVarSize_));
+        if (invalidY) {
+            throw ParserError(
+                    currentLine_-1,
+                    "too large index of the unknown",
+                    ParserError::Type::SEMANTIC_ERROR
+            );
+        }
+        yConds_.insert(yConds_.end(), ls.begin(), ls.end());
         return;
     }
     throw ParserError(
@@ -283,8 +293,8 @@ void GllsParser::solveX(
         );
     }
     /* solve X */
-    if (ls.cbegin()->size() != 2 || (*ls.cbegin())[1].first !=
-            CondDict::ID_CONST) {
+    if (ls.cbegin()->size() != 2
+        || (*ls.cbegin())[1].first != CondDict::ID_CONST) {
         throw ParserError(
                 currentLine_-1,
                 "this version only solves one "
