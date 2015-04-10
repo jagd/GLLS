@@ -8,6 +8,7 @@
 #include "symbollist.h"
 #include <iosfwd>
 #include <vector>
+#include <list>
 #include <string>
 
 class GllsParser
@@ -49,8 +50,8 @@ private:
     /** the presentation of X_n = c, with n >= 0 in int and c in double */
     std::vector<std::pair<int, double> > xValues_;
     /** list of zerofied polynomials */
-    std::vector<std::vector<std::pair<int, double> > > yConds_;
-    void solveX(const std::vector<std::vector<std::pair<int, double> > > &);
+    std::list<std::vector<std::pair<int, double> > > yConds_;
+    void solveX(const std::list<std::vector<std::pair<int, double> > > &);
 };
 
 

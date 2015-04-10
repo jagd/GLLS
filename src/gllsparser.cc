@@ -4,6 +4,7 @@
 #include "condparser.h"
 
 #include <vector>
+#include <list>
 #include <sstream>
 #include <algorithm>
 #include <functional>
@@ -192,7 +193,7 @@ void GllsParser::guessXVarSize(const std::string &s)
     assert(xVarSize_ > 0);
 }
 
-static std::vector<std::vector<std::pair<int, double> > >
+static std::list<std::vector<std::pair<int, double> > >
 auxLinearEquation(
         const std::string &s,
         const SymbolList &sl,
@@ -202,7 +203,7 @@ auxLinearEquation(
     std::istringstream ss(s);
     auto cp = CondParser(ss, sl, xName);
     auto cs = cp.parse();
-    std::vector<std::vector<std::pair<int, double> > > ls(cs.size());
+    std::list<std::vector<std::pair<int, double> > > ls(cs.size());
     std::transform(cs.begin(), cs.end(), ls.begin(),
         [](CondTree &t){
             const auto res = finalizeTree(t);
@@ -220,7 +221,7 @@ auxLinearEquation(
 }
 
 static bool auxHasSymbol(
-        const std::vector<std::vector<std::pair<int, double> > > &ls,
+        const std::list<std::vector<std::pair<int, double> > > &ls,
         std::function<bool(int)> f
 )
 {
@@ -238,7 +239,7 @@ static bool auxHasSymbol(
 void GllsParser::attachCond(const std::string &s)
 {
     assert(!s.empty());
-    std::vector<std::vector<std::pair<int, double> > > ls;
+    std::list<std::vector<std::pair<int, double> > > ls;
     try {
         ls = auxLinearEquation(s, sym_, xVarName_);
     } catch (ParserError &e) {
@@ -270,7 +271,7 @@ void GllsParser::attachCond(const std::string &s)
 }
 
 void GllsParser::solveX(
-        const std::vector<std::vector<std::pair<int, double>>>  &ls
+        const std::list<std::vector<std::pair<int, double>>>  &ls
 )
 {
     if (ls.size() != 1) {
@@ -282,7 +283,8 @@ void GllsParser::solveX(
         );
     }
     /* solve X */
-    if (ls[0].size() != 2 || ls[0][1].first != CondDict::ID_CONST) {
+    if (ls.cbegin()->size() != 2 || (*ls.cbegin())[1].first !=
+            CondDict::ID_CONST) {
         throw ParserError(
                 currentLine_-1,
                 "this version only solves one "
@@ -290,7 +292,7 @@ void GllsParser::solveX(
                 ParserError::Type::SEMANTIC_ERROR
         );
     }
-    const auto id = CondDict::ID_X_VAR_NEG_BASE-ls[0][0].first;
+    const auto id = CondDict::ID_X_VAR_NEG_BASE-(*ls.cbegin())[0].first;
     if (id >= xVarSize_) {
         throw ParserError(
                 currentLine_-1,
@@ -299,5 +301,6 @@ void GllsParser::solveX(
                 ParserError::Type::SEMANTIC_ERROR
         );
     }
-    xValues_.push_back(std::make_pair(id,-ls[0][1].second/ls[0][0].second));
+    xValues_.push_back(std::make_pair(
+            id,-(*ls.cbegin())[1].second/(*ls.cbegin())[0].second) );
 }
