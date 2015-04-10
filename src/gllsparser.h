@@ -6,6 +6,7 @@
 #define _GENERAL_LINEAR_LEAST_SQUARES_GLLSPARSER_H_
 
 #include "symbollist.h"
+#include "glls.h"
 #include <iosfwd>
 #include <vector>
 #include <list>
@@ -15,12 +16,14 @@ class GllsParser
 {
 public:
     GllsParser(std::istream &stream_, bool homogeneous = true);
-    std::vector<double> run();
+    GllsProblem run();
     const std::string &xVarName() const { return xVarName_; }
     const SymbolList &symbols() const { return sym_; }
     int xVarSize() const { return xVarSize_; }
     int yVarSize() const { return yVarSize_; }
     const std::vector<double> &coef() const { return coef_; }
+    const std::list<std::vector<std::pair<int, double> > > &yConds() const
+        { return yConds_; }
     const std::vector<std::pair<int, double> > &xValues() const
         { return xValues_; }
 private:

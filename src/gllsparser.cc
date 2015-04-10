@@ -16,14 +16,17 @@ GllsParser::GllsParser(std::istream &stream_, bool homo)
 {
 }
 
-std::vector<double> GllsParser::run()
+GllsProblem GllsParser::run()
 {
     readXVarName();
     sym_.clear();
     readYVarNames();
     coef_.clear();
     readCoefWithCond();
-    return std::vector<double>();
+    GllsProblem g;
+    g.coef = coef_;
+    g.xSize = xVarSize_;
+    return g;
 }
 
 void GllsParser::readXVarName()

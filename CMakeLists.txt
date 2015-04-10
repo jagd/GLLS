@@ -55,6 +55,25 @@ add_custom_target(coverage
 )
 
 ########################################
+add_test(glls test_glls)
+add_executable(test_glls
+    test/glls.cc
+    src/condparser.cc
+    src/condparser.h
+    src/condtree.cc
+    src/condtree.h
+    src/glls.cc
+    src/glls.h
+    src/gllsparser.cc
+    src/gllsparser.h
+    src/parsercommon.cc
+    src/parsercommon.h
+    src/symbollist.cc
+    src/symbollist.h
+    )
+target_link_libraries(test_glls ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+
+########################################
 add_test(gllsparser test_gllsparser)
 add_executable(test_gllsparser
     test/gllsparser.cc
