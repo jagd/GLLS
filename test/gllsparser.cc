@@ -193,6 +193,45 @@ BOOST_AUTO_TEST_SUITE()
         BOOST_CHECK_EQUAL(gp.yVarSize(), 2);
     }
 
+    BOOST_AUTO_TEST_CASE(ReadCond_Failure_1) {
+        std::istringstream ss(
+                "x\ny\n1 2 3 4 \n 4 5 6 8\n (x0-3)*5=1+1*4\n 1=6"
+        );
+        GllsParser gp(ss, false);
+        BOOST_CHECK_EXCEPTION(gp.run(), ParserError,
+                [](const ParserError &e) {
+                    BOOST_CHECK_EQUAL(e.line(), 6);
+                    BOOST_CHECK(e.msg().find('at least') != std::string::npos);
+                    return e.type() == ParserError::Type::SEMANTIC_ERROR;
+                }
+        );
+    }
+
+    BOOST_AUTO_TEST_CASE(ReadCond_Failure_2) {
+        std::istringstream ss(
+                "x\ny\n1 2 3 4 \n 4 5 6 8\n (x0-3)*5=1+1*4+y2"
+        );
+        std::istringstream ss2(
+                "x\ny\n1 2 3 4 \n 4 5 6 8\n y0=y1+1\n(x0-3)*5=1+1*4+y2"
+        );
+        GllsParser gp(ss, false);
+        BOOST_CHECK_EXCEPTION(gp.run(), ParserError,
+                [](const ParserError &e) {
+                    BOOST_CHECK_EQUAL(e.line(), 5);
+                    BOOST_CHECK(e.msg().find('mix') != std::string::npos);
+                    return e.type() == ParserError::Type::SEMANTIC_ERROR;
+                }
+        );
+        GllsParser gp2(ss2, false);
+        BOOST_CHECK_EXCEPTION(gp2.run(), ParserError,
+                [](const ParserError &e) {
+                    BOOST_CHECK_EQUAL(e.line(), 6);
+                    BOOST_CHECK(e.msg().find('mix') != std::string::npos);
+                    return e.type() == ParserError::Type::SEMANTIC_ERROR;
+                }
+        );
+    }
+
     BOOST_AUTO_TEST_CASE(SolveX_1) {
         std::istringstream ss(
                 "x\ny\n1 2 3 4 \n 4 5 6 8\n (x0-3)*5=1+1*4\n x2=6");

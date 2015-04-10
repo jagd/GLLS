@@ -126,6 +126,7 @@ void GllsParser::readCoefWithCond()
     attachCond(firstCond);
     while (true) {
         const auto p = nextLine(stream_);
+        currentLine_ += p.first;
         if (p.first > 0) {
             attachCond(p.second);
         } else {
@@ -274,7 +275,7 @@ void GllsParser::solveX(
 {
     if (ls.size() != 1) {
         throw ParserError(
-                currentLine_,
+                currentLine_-1,
                 "this version do not accept multiple equation of variable "
                 + xVarName_ + " in one same line",
                 ParserError::Type::SEMANTIC_ERROR
@@ -283,7 +284,7 @@ void GllsParser::solveX(
     /* solve X */
     if (ls[0].size() != 2 || ls[0][1].first != CondDict::ID_CONST) {
         throw ParserError(
-                currentLine_,
+                currentLine_-1,
                 "this version only solves one "
                 + xVarName_ + " variable in one equation",
                 ParserError::Type::SEMANTIC_ERROR
@@ -292,7 +293,7 @@ void GllsParser::solveX(
     const auto id = CondDict::ID_X_VAR_NEG_BASE-ls[0][0].first;
     if (id >= xVarSize_) {
         throw ParserError(
-                currentLine_,
+                currentLine_-1,
                 "variable "
                 + xVarName_ + std::to_string(id) + " does not exist",
                 ParserError::Type::SEMANTIC_ERROR
