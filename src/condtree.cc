@@ -452,3 +452,25 @@ bool isEqual(
     }
     return true;
 }
+
+const char *toString(FinalizationStatus status)
+{
+    switch (status) {
+        case FinalizationStatus::SUCCESS:
+            return "success";
+        case FinalizationStatus::UNKNOWN_FAILURE:
+            return "unknown failure";
+        case FinalizationStatus::INVALID_EXPRESSION:
+            return "invalid expression";
+        case FinalizationStatus::INVALID_OPERATOR:
+            return "invalid operator";
+        case FinalizationStatus::HIGH_ORDER:
+            return "high order is not allowed (non-linear)";
+        case FinalizationStatus::DIVIDE_SYMBOL:
+            return "divided by symbol is not allowed (non-linear)";
+        case FinalizationStatus::DIVIDE_ZERO:
+            return "divided by zero";
+        default:
+            return "invalid status ";
+    }
+}

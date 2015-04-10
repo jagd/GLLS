@@ -20,7 +20,8 @@ public:
     int xVarSize() const { return xVarSize_; }
     int yVarSize() const { return yVarSize_; }
     const std::vector<double> &coef() const { return coef_; }
-
+    const std::vector<std::pair<int, double> > &xValues() const
+        { return xValues_; }
 private:
     GllsParser(const GllsParser &) = delete;
     GllsParser &operator=(const GllsParser &) = delete;
@@ -45,6 +46,11 @@ private:
     std::string xVarName_;
     SymbolList sym_;
     std::vector<double> coef_;
+    /** the presentation of X_n = c, with n >= 0 in int and c in double */
+    std::vector<std::pair<int, double> > xValues_;
+    /** list of zerofied polynomials */
+    std::vector<std::vector<std::pair<int, double> > > yConds_;
+    void solveX(const std::vector<std::vector<std::pair<int, double> > > &);
 };
 
 

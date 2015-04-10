@@ -62,6 +62,8 @@ enum class FinalizationStatus
     DIVIDE_ZERO
 };
 
+const char *toString(FinalizationStatus);
+
 FinalizationStatus finalizeTree(std::unique_ptr<CondTreeNode> &);
 inline FinalizationStatus finalizeTree(CondTree &tree)
 {

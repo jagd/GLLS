@@ -191,14 +191,112 @@ void GllsParser::guessXVarSize(const std::string &s)
     assert(xVarSize_ > 0);
 }
 
-void GllsParser::attachCond(const std::string &s)
+static std::vector<std::vector<std::pair<int, double> > >
+auxLinearEquation(
+        const std::string &s,
+        const SymbolList &sl,
+        const std::string &xName
+)
 {
     std::istringstream ss(s);
-    auto cp = CondParser(ss, sym_, xVarName_);
-    std::vector<CondTree> cs;
+    auto cp = CondParser(ss, sl, xName);
+    auto cs = cp.parse();
+    std::vector<std::vector<std::pair<int, double> > > ls(cs.size());
+    std::transform(cs.begin(), cs.end(), ls.begin(),
+        [](CondTree &t){
+            const auto res = finalizeTree(t);
+            if (res != FinalizationStatus::SUCCESS) {
+                throw ParserError(
+                        0,
+                        toString(res),
+                        ParserError::Type::SEMANTIC_ERROR
+                );
+            }
+            return toList(t);
+        }
+    );
+    return ls;
+}
+
+static bool auxHasSymbol(
+        const std::vector<std::vector<std::pair<int, double> > > &ls,
+        std::function<bool(int)> f
+)
+{
+    return std::any_of(ls.cbegin(), ls.cend(),
+            [&f](const std::vector<std::pair<int, double> > &xs) {
+                return std::any_of(xs.begin(), xs.end(),
+                        [&f](const std::pair<int, double> &x){
+                            return f(x.first);
+                        }
+                );
+            }
+    );
+}
+
+void GllsParser::attachCond(const std::string &s)
+{
+    assert(!s.empty());
+    std::vector<std::vector<std::pair<int, double> > > ls;
     try {
-        cs = cp.parse();
+        ls = auxLinearEquation(s, sym_, xVarName_);
     } catch (ParserError &e) {
         throw ParserError(e.line()+currentLine_-1, e.msg(), e.type());
     }
+    const bool hasX = auxHasSymbol(ls, std::bind2nd(std::less_equal<int>(),
+                    static_cast<int>(CondDict::ID_X_VAR_NEG_BASE)));
+    const bool hasY = auxHasSymbol(ls, std::bind2nd(std::greater_equal<int>(),
+                    static_cast<int>(CondDict::ID_Y_VAR_POS_BASE)));
+    if (hasX && hasY) {
+        throw ParserError(
+                currentLine_-1,
+                "can not mix X and Y parameters",
+                ParserError::Type::SEMANTIC_ERROR
+        );
+    }
+    if (hasX) {
+        solveX(ls);
+        return;
+    }
+    if (hasY) {
+        return;
+    }
+    throw ParserError(
+            currentLine_-1,
+            "equation does not have any unknown",
+            ParserError::Type::SEMANTIC_ERROR
+    );
+}
+
+void GllsParser::solveX(
+        const std::vector<std::vector<std::pair<int, double>>>  &ls
+)
+{
+    if (ls.size() != 1) {
+        throw ParserError(
+                currentLine_,
+                "this version do not accept multiple equation of variable "
+                + xVarName_ + " in one same line",
+                ParserError::Type::SEMANTIC_ERROR
+        );
+    }
+    /* solve X */
+    if (ls[0].size() != 2 || ls[0][1].first != CondDict::ID_CONST) {
+        throw ParserError(
+                currentLine_,
+                "this version only solves one "
+                + xVarName_ + " variable in one equation",
+                ParserError::Type::SEMANTIC_ERROR
+        );
+    }
+    const auto id = CondDict::ID_X_VAR_NEG_BASE-ls[0][0].first;
+    if (id >= xVarSize_) {
+        throw ParserError(
+                currentLine_,
+                "variable "
+                + xVarName_ + std::to_string(id) + " does not exist",
+                ParserError::Type::SEMANTIC_ERROR
+        );
+    }
+    xValues_.push_back(std::make_pair(id,-ls[0][1].second/ls[0][0].second));
 }

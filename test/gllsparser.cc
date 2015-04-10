@@ -1,5 +1,6 @@
 #include "../src/gllsparser.h"
 #include "../src/parsercommon.h"
+#include "../src/condparser.h"
 #include <sstream>
 
 #ifndef BOOST_TEST_DYN_LINK
@@ -190,6 +191,58 @@ BOOST_AUTO_TEST_SUITE()
         BOOST_CHECK_EQUAL(gp.xVarName(), "x");
         BOOST_CHECK_EQUAL(gp.xVarSize(), 3);
         BOOST_CHECK_EQUAL(gp.yVarSize(), 2);
+    }
+
+    BOOST_AUTO_TEST_CASE(SolveX_1) {
+        std::istringstream ss(
+                "x\ny\n1 2 3 4 \n 4 5 6 8\n (x0-3)*5=1+1*4\n x2=6");
+        GllsParser gp(ss, false);
+        BOOST_REQUIRE_NO_THROW(gp.run());
+        BOOST_REQUIRE_EQUAL(gp.xVarName(), "x");
+        BOOST_CHECK_CLOSE(gp.xValues()[0].second, 4.0, 1e-9);
+        BOOST_CHECK_EQUAL(gp.xValues()[0].first, 0);
+        BOOST_CHECK_CLOSE(gp.xValues()[1].second, 6.0, 1e-9);
+        BOOST_CHECK_EQUAL(gp.xValues()[1].first, 2);
+    }
+
+    BOOST_AUTO_TEST_CASE(SolveX_2) {
+        std::istringstream ss(
+                "x\ny\n1 2 3 4 \n 4 5 6 8\n (x0-3)*5=1+1*4\n x8=6"
+        );
+        GllsParser gp(ss, false);
+        BOOST_CHECK_EXCEPTION(gp.run(), ParserError,
+                [](const ParserError &e) {
+                    BOOST_CHECK_EQUAL(e.line(), 6);
+                    BOOST_CHECK(e.msg().find('8') != std::string::npos);
+                    return e.type() == ParserError::Type::SEMANTIC_ERROR;
+                }
+        );
+    }
+
+    BOOST_AUTO_TEST_CASE(SolveX_3) {
+        std::istringstream ss(
+                "x\ny\n1 2 3 4 \n 4 5 6 8\n (x0-3)*5=1+1*4\n x0+x1=6\n"
+        );
+        GllsParser gp(ss, false);
+        BOOST_CHECK_EXCEPTION(gp.run(), ParserError,
+                [](const ParserError &e) {
+                    BOOST_CHECK_EQUAL(e.line(), 6);
+                    return e.type() == ParserError::Type::SEMANTIC_ERROR;
+                }
+        );
+    }
+
+    BOOST_AUTO_TEST_CASE(SolveX_4) {
+        std::istringstream ss(
+                "x\ny\n1 2 3 4 \n 4 5 6 8\n (x0-3)*5=1+1*4\n x0=6=x1\n"
+        );
+        GllsParser gp(ss, false);
+        BOOST_CHECK_EXCEPTION(gp.run(), ParserError,
+                [](const ParserError &e) {
+                    BOOST_CHECK_EQUAL(e.line(), 6);
+                    return e.type() == ParserError::Type::SEMANTIC_ERROR;
+                }
+        );
     }
 
 BOOST_AUTO_TEST_SUITE_END()
