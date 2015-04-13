@@ -23,7 +23,7 @@ void arrangeX(
                     const std::pair<int, double> &a,
                     const std::pair<int, double> &b
             ) {
-                return a.second < b.second;
+                return a.first < b.first;
             });
     for (int row = 0; row < rows; ++row) {
         coef[cols*(row+1) - 1] = g.coef[origCols*(row+1) - 1];
