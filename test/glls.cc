@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(TestSystem)
 
-    BOOST_AUTO_TEST_CASE(Glls_Exact) {
+    BOOST_AUTO_TEST_CASE(Glls_Exact_1) {
         std::istringstream ss(
                 "x\ny\n1 2 3 4 \n 8 7 6 5\n x0=2\n x2=-1\ny0=0\ny1=0"
         );
@@ -74,9 +74,21 @@ BOOST_AUTO_TEST_SUITE(TestSystem)
         BOOST_CHECK_CLOSE(x[3], 1.5, 1e-9);
     }
 
+    BOOST_AUTO_TEST_CASE(Glls_Exact_2) {
+        std::istringstream ss(
+                "x\ny\n1 2 3 4 \n 8 7 6 5\n x0=2\n x2=-1\ny0=6\ny1=9"
+        );
+        auto x = glls(ss);
+        BOOST_REQUIRE_EQUAL(x.size(), 4);
+        BOOST_CHECK_CLOSE(x[0], 2.0, 1e-9);
+        BOOST_CHECK_CLOSE(x[1], -2.166666666666666667, 1e-9);
+        BOOST_CHECK_CLOSE(x[2], -1.0, 1e-9);
+        BOOST_CHECK_CLOSE(x[3], 2.833333333333333, 1e-9);
+    }
+
     BOOST_AUTO_TEST_CASE(Glls_OverDeterm) {
         std::istringstream ss(
-                "x\ny\n1 2\n 3 4\n 5 6\n 1 = y0 = y1 = y2"
+                "x\ny\n1 2\n 3 4\n 5 6\n y0 = y1 = 1 = y2"
         );
         auto x = glls(ss);
         BOOST_REQUIRE_EQUAL(x.size(), 2);
