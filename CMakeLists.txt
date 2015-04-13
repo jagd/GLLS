@@ -39,6 +39,7 @@ set(all_tests
     test_gllsparser
     test_parsercommon
     test_symbollist
+    test_glls
 )
 
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${all_tests})
