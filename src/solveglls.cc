@@ -1,13 +1,16 @@
 #include "solveglls.h"
+#include "condparser.h"
 
 #include <algorithm>
 #include <cassert>
 #include <utility>
 #include <vector>
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/triangular.hpp>
 #include <boost/numeric/ublas/lu.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/matrix_proxy.hpp>
+#include <boost/numeric/ublas/triangular.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/vector_proxy.hpp>
 
 void arrangeX(
         GllsProblem &g,
@@ -70,8 +73,13 @@ void arrangeY(
     for (const auto &eq : ys) {
         std::vector<double> c(cols);
         for (const auto &y : eq) {
-            for (int i = 0; i < cols; ++i) {
-                c[i] += y.second * g.coef[y.first*cols + i];
+            if (y.first == CondDict::ID_CONST) {
+                c[cols-1] += y.second;
+            } else {
+                assert(y.first >= 0);
+                for (int i = 0; i < cols; ++i) {
+                    c[i] += y.second * g.coef[y.first*cols + i];
+                }
             }
         }
         std::copy(c.cbegin(), c.cend(), std::back_inserter(coef));
@@ -81,31 +89,42 @@ void arrangeY(
 
 boost::numeric::ublas::vector<double>
 solveLeastSquare(
-        boost::numeric::ublas::matrix<double> &&m,
-        boost::numeric::ublas::vector<double> &&b
+        const boost::numeric::ublas::matrix<double> &m,
+        const boost::numeric::ublas::vector<double> &b
     )
 {
+    using namespace boost::numeric::ublas;
+    permutation_matrix<std::size_t> pm(m.size1());
+    vector<double> x;
+    matrix<double> a;
+    axpy_prod(b, m, x, true);
+    axpy_prod(trans(m), m, a, true);
+    lu_factorize(a, pm);
+    lu_substitute(a, pm, x);
+    return x;
 }
 
 boost::numeric::ublas::vector<double>
 solveMinNorm(
-        boost::numeric::ublas::matrix<double> &&m,
-        boost::numeric::ublas::vector<double> &&b
+        const boost::numeric::ublas::matrix<double> &m,
+        const boost::numeric::ublas::vector<double> &b
 )
 {
 }
 
 boost::numeric::ublas::vector<double>
 solveExact(
-        boost::numeric::ublas::matrix<double> &&m,
-        boost::numeric::ublas::vector<double> &&b
+        const boost::numeric::ublas::matrix<double> &m,
+        const boost::numeric::ublas::vector<double> &b
 )
 {
     using namespace boost::numeric::ublas;
-    permutation_matrix<std::size_t> pm(m.size1());
-    lu_factorize(m, pm);
-    lu_substitute(m, pm, b);
-    return b;
+    auto a = m;
+    auto x = b;
+    permutation_matrix<std::size_t> pm(a.size1());
+    lu_factorize(a, pm);
+    lu_substitute(a, pm, x);
+    return x;
 }
 
 template<class IT> std::vector<double>
@@ -147,11 +166,11 @@ std::vector<double> solve(GllsProblem const &g)
     }
     vector<double> x;
     if (rows > g.xSize) {
-        x = solveLeastSquare(std::move(m), std::move(b));
+        x = solveLeastSquare(m, b);
     } else if (rows < g.xSize) {
-        x = solveMinNorm(std::move(m), std::move(b));
+        x = solveMinNorm(m, b);
     } else {
-        x = solveExact(std::move(m), std::move(b));
+        x = solveExact(m, b);
     }
     return fullX(x.begin(), g);
 }
