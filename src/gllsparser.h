@@ -6,7 +6,7 @@
 #define _GENERAL_LINEAR_LEAST_SQUARES_GLLSPARSER_H_
 
 #include "symbollist.h"
-#include "glls.h"
+#include "solveglls.h"
 #include <iosfwd>
 #include <vector>
 #include <list>

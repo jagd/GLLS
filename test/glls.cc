@@ -1,9 +1,10 @@
 #include "../src/parsercommon.h"
 #include "../src/symbollist.h"
-#include "../src/condparser.h"
 #include "../src/condtree.h"
-#include "../src/glls.h"
+#include "../src/condparser.h"
+#include "../src/solveglls.h"
 #include "../src/gllsparser.h"
+#include "../src/glls.h"
 #include <sstream>
 
 #ifndef BOOST_TEST_DYN_LINK
@@ -58,3 +59,20 @@ BOOST_AUTO_TEST_SUITE()
     }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(TestSystem)
+
+    BOOST_AUTO_TEST_CASE(Glls_1) {
+        std::istringstream ss(
+                "x\ny\n1 2 3 4 \n 8 7 6 5\n x0=2\n x2=-1\ny0=-1\ny1=0"
+        );
+        auto x = glls(ss);
+        BOOST_REQUIRE_EQUAL(x.size(), 4);
+        BOOST_CHECK_CLOSE(x[0], 2.0, 1e-9);
+        BOOST_CHECK_CLOSE(x[1], -2.5, 1e-9);
+        BOOST_CHECK_CLOSE(x[2], -1.0, 1e-9);
+        BOOST_CHECK_CLOSE(x[3], 1.5, 1e-9);
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+

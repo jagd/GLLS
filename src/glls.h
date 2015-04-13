@@ -1,29 +1,11 @@
-/**
-    @file glls.h
-*/
-
 #ifndef GENERAL_LINEAR_LEAST_SQUARES_GLLS_H
 #define GENERAL_LINEAR_LEAST_SQUARES_GLLS_H
 
-#include <vector>
-#include <list>
+#include "solveglls.h"
+#include "gllsparser.h"
 
-struct GllsProblem
-{
-    int xSize;
-    std::vector<double> reservedX;
-    std::vector<double> coef;
-};
+#include <iosfwd>
 
-void arrangeX(
-        GllsProblem &,
-        const std::vector<std::pair<int, double> > &xs
-);
+std::vector<double> glls(std::istream &s);
 
-void arrangeY(
-        GllsProblem &,
-        const std::list<std::vector<std::pair<int, double> > > &ys
-);
-
-#endif //GENERAL_LINEAR_LEAST_SQUARES_GLLS_H
-
+#endif
