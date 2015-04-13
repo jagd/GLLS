@@ -94,11 +94,10 @@ solveLeastSquare(
     )
 {
     using namespace boost::numeric::ublas;
-    permutation_matrix<std::size_t> pm(m.size1());
-    vector<double> x;
-    matrix<double> a;
-    axpy_prod(b, m, x, true);
-    axpy_prod(trans(m), m, a, true);
+    const auto tm = trans(m);
+    vector<double> x = prod(tm, b);
+    matrix<double> a = prod(tm, m);
+    permutation_matrix<std::size_t> pm(a.size1());
     lu_factorize(a, pm);
     lu_substitute(a, pm, x);
     return x;
