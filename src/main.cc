@@ -1,15 +1,17 @@
-#include "gllsparser.h"
+#include "glls.h"
 #include "parsercommon.h"
 #include <iostream>
 
 int main() {
-    GllsParser glls(std::cin);
     try {
-        glls.run();
+        for (const auto x : glls(std::cin)) {
+            std::cout << x << ' ';
+        }
     } catch (ParserError &e){
         std::cerr <<  "Error on input line "
                   << e.line() << ": " << e.what()
                   << std::endl;
     }
+    std::cout << '\n';
     return 0;
 }
