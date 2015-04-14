@@ -104,11 +104,19 @@ solveLeastSquare(
 }
 
 boost::numeric::ublas::vector<double>
-solveMinNorm(
+solveMinX2Norm(
         const boost::numeric::ublas::matrix<double> &m,
         const boost::numeric::ublas::vector<double> &b
 )
 {
+    using namespace boost::numeric::ublas;
+    const matrix<double> mt = trans(m);
+    matrix<double> a = prod(m, mt);
+    vector<double> w = b;
+    permutation_matrix<std::size_t> pm(a.size1());
+    lu_factorize(a, pm);
+    lu_substitute(a, pm, w);
+    return prod(mt, w);
 }
 
 boost::numeric::ublas::vector<double>
@@ -167,7 +175,7 @@ std::vector<double> solve(GllsProblem const &g)
     if (rows > g.xSize) {
         x = solveLeastSquare(m, b);
     } else if (rows < g.xSize) {
-        x = solveMinNorm(m, b);
+        x = solveMinX2Norm(m, b);
     } else {
         x = solveExact(m, b);
     }

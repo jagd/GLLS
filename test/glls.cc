@@ -96,5 +96,14 @@ BOOST_AUTO_TEST_SUITE(TestSystem)
         BOOST_CHECK_CLOSE(x[1], 1, 1e-9);
     }
 
+    BOOST_AUTO_TEST_CASE(Glls_UnderDeterm) {
+        std::istringstream ss(
+                "x\ny\n1 2\n y0 = 5"
+        );
+        auto x = glls(ss);
+        BOOST_CHECK_CLOSE(x[0], 1, 1e-9);
+        BOOST_CHECK_CLOSE(x[1], 2, 1e-9);
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
 
